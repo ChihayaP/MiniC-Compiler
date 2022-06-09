@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = D:\CompilerTools64\msys64\mingw64\bin\cmake.exe --regenerate-during-build -SD:\ChihayaP\Desktop\MiniC-Compiler -BD:\ChihayaP\Desktop\MiniC-Compiler\cmake-build-debug
+  command = D:\CompilerTools64\msys64\mingw64\bin\cmake.exe --regenerate-during-build -SD:\Git\MiniC-Compiler -BD:\Git\MiniC-Compiler\cmake-build-debug
   description = Re-running CMake...
   generator = 1
 

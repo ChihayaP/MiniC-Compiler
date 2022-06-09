@@ -39,7 +39,7 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = D$:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/
+cmake_ninja_workdir = D$:/Git/MiniC-Compiler/cmake-build-debug/
 # =============================================================================
 # Object build statements for EXECUTABLE target main
 
@@ -49,31 +49,31 @@ cmake_ninja_workdir = D$:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/
 
 build cmake_object_order_depends_target_main: phony || lex.yy.c parser.tab.c parser.tab.h
 
-build CMakeFiles/main.dir/parser.tab.c.obj: C_COMPILER__main_Debug D$:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/parser.tab.c || cmake_object_order_depends_target_main
+build CMakeFiles/main.dir/parser.tab.c.obj: C_COMPILER__main_Debug D$:/Git/MiniC-Compiler/cmake-build-debug/parser.tab.c || cmake_object_order_depends_target_main
   DEP_FILE = CMakeFiles\main.dir\parser.tab.c.obj.d
   FLAGS = -g
-  INCLUDES = -ID:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug -ID:/ChihayaP/Desktop/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
+  INCLUDES = -ID:/Git/MiniC-Compiler/cmake-build-debug -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
   OBJECT_DIR = CMakeFiles\main.dir
   OBJECT_FILE_DIR = CMakeFiles\main.dir
 
-build CMakeFiles/main.dir/lex.yy.c.obj: C_COMPILER__main_Debug D$:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/lex.yy.c || cmake_object_order_depends_target_main
+build CMakeFiles/main.dir/lex.yy.c.obj: C_COMPILER__main_Debug D$:/Git/MiniC-Compiler/cmake-build-debug/lex.yy.c || cmake_object_order_depends_target_main
   DEP_FILE = CMakeFiles\main.dir\lex.yy.c.obj.d
   FLAGS = -g
-  INCLUDES = -ID:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug -ID:/ChihayaP/Desktop/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
+  INCLUDES = -ID:/Git/MiniC-Compiler/cmake-build-debug -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
   OBJECT_DIR = CMakeFiles\main.dir
   OBJECT_FILE_DIR = CMakeFiles\main.dir
 
-build CMakeFiles/main.dir/main.c.obj: C_COMPILER__main_Debug D$:/ChihayaP/Desktop/MiniC-Compiler/main.c || cmake_object_order_depends_target_main
+build CMakeFiles/main.dir/main.c.obj: C_COMPILER__main_Debug D$:/Git/MiniC-Compiler/main.c || cmake_object_order_depends_target_main
   DEP_FILE = CMakeFiles\main.dir\main.c.obj.d
   FLAGS = -g
-  INCLUDES = -ID:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug -ID:/ChihayaP/Desktop/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
+  INCLUDES = -ID:/Git/MiniC-Compiler/cmake-build-debug -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
   OBJECT_DIR = CMakeFiles\main.dir
   OBJECT_FILE_DIR = CMakeFiles\main.dir
 
-build CMakeFiles/main.dir/ast.c.obj: C_COMPILER__main_Debug D$:/ChihayaP/Desktop/MiniC-Compiler/ast.c || cmake_object_order_depends_target_main
+build CMakeFiles/main.dir/ast.c.obj: C_COMPILER__main_Debug D$:/Git/MiniC-Compiler/ast.c || cmake_object_order_depends_target_main
   DEP_FILE = CMakeFiles\main.dir\ast.c.obj.d
   FLAGS = -g
-  INCLUDES = -ID:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug -ID:/ChihayaP/Desktop/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
+  INCLUDES = -ID:/Git/MiniC-Compiler/cmake-build-debug -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
   OBJECT_DIR = CMakeFiles\main.dir
   OBJECT_FILE_DIR = CMakeFiles\main.dir
 
@@ -100,7 +100,7 @@ build main.exe: C_EXECUTABLE_LINKER__main_Debug CMakeFiles/main.dir/parser.tab.c
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\ChihayaP\Desktop\MiniC-Compiler\cmake-build-debug && D:\CompilerTools64\msys64\mingw64\bin\cmake-gui.exe -SD:\ChihayaP\Desktop\MiniC-Compiler -BD:\ChihayaP\Desktop\MiniC-Compiler\cmake-build-debug"
+  COMMAND = cmd.exe /C "cd /D D:\Git\MiniC-Compiler\cmake-build-debug && D:\CompilerTools64\msys64\mingw64\bin\cmake-gui.exe -SD:\Git\MiniC-Compiler -BD:\Git\MiniC-Compiler\cmake-build-debug"
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -112,7 +112,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D D:\ChihayaP\Desktop\MiniC-Compiler\cmake-build-debug && D:\CompilerTools64\msys64\mingw64\bin\cmake.exe --regenerate-during-build -SD:\ChihayaP\Desktop\MiniC-Compiler -BD:\ChihayaP\Desktop\MiniC-Compiler\cmake-build-debug"
+  COMMAND = cmd.exe /C "cd /D D:\Git\MiniC-Compiler\cmake-build-debug && D:\CompilerTools64\msys64\mingw64\bin\cmake.exe --regenerate-during-build -SD:\Git\MiniC-Compiler -BD:\Git\MiniC-Compiler\cmake-build-debug"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -124,7 +124,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # Custom command for parser.tab.c
 
 build parser.tab.c parser.tab.h | ${cmake_ninja_workdir}parser.tab.c ${cmake_ninja_workdir}parser.tab.h: CUSTOM_COMMAND ../parser.y
-  COMMAND = cmd.exe /C "cd /D D:\ChihayaP\Desktop\MiniC-Compiler\cmake-build-debug && bison -d -o parser.tab.c ../parser.y"
+  COMMAND = cmd.exe /C "cd /D D:\Git\MiniC-Compiler\cmake-build-debug && bison -d -o parser.tab.c ../parser.y"
   DESC = Generating parser.tab.c, parser.tab.h
   restat = 1
 
@@ -133,7 +133,7 @@ build parser.tab.c parser.tab.h | ${cmake_ninja_workdir}parser.tab.c ${cmake_nin
 # Custom command for lex.yy.c
 
 build lex.yy.c | ${cmake_ninja_workdir}lex.yy.c: CUSTOM_COMMAND ../lex.l
-  COMMAND = cmd.exe /C "cd /D D:\ChihayaP\Desktop\MiniC-Compiler\cmake-build-debug && flex -o lex.yy.c ../lex.l"
+  COMMAND = cmd.exe /C "cd /D D:\Git\MiniC-Compiler\cmake-build-debug && flex -o lex.yy.c ../lex.l"
   DESC = Generating lex.yy.c
   restat = 1
 
@@ -148,7 +148,7 @@ build main: phony main.exe
 # =============================================================================
 
 #############################################
-# Folder: D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug
+# Folder: D:/Git/MiniC-Compiler/cmake-build-debug
 
 build all: phony main.exe
 

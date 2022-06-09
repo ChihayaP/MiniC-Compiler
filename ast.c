@@ -4,6 +4,9 @@
 #include <gvc.h>
 #include <gvcext.h>
 
+int agnodeNum = 0;
+char agnodeChar[100] = "";
+
 struct node * mknode(node_kind kind,struct node *first,struct node *second, struct node *third,int pos ) 
 {
     struct node *T=(struct node *)malloc(sizeof(struct node));
@@ -21,42 +24,60 @@ Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
     char nodeLabel[100] = "";
     int num;
     char tmpChar[100] = {0};
-    Agnode_t *child_node = agnode(g, T->type_node, 1);
+    Agnode_t *child_node;
     switch (T->kind) {
-        case _FUNCDEF:            
-        case _BLOCK:           
+        case _MULEXP:            
+        case _ADDEXP:
+        case _EXP:
+        case _UNARYEXP:
+        case _PRIMARYEXP:
+        case _NUMBER:
+            child_node = parent_node;          
             break;
-        
-        case _FUNCTYPE:            
-            strcpy(labelTmp, " \\ | int");
-            break;
-        case _IDENT:            
-            strcpy(labelTmp, " \\ | ");
-            strcat(labelTmp, T->type_id);
-            break;
-        case _STMT:            
-            strcpy(labelTmp, " \\ | return");
+        case _FUNCDEF:
+        case _INT:
+        case _IDENT:
+        case _STMT:
+        case _RETURN:
+        case _PLUS:
+        case _MINUS:
+        case _MUL:
+        case _DIV:
+        case _MOD:
+        case _POSI:
+        case _NEGA:
+        case _NOT:
+            memset(agnodeChar,0,sizeof(agnodeChar));
+            child_node = agnode(g, itoa(agnodeNum,agnodeChar,10), 1);
+            agnodeNum++;
+            strcpy(nodeLabel, T->type_id);
+            if(child_node != NULL) {
+                agsafeset(child_node, (char *)"label", (char *)nodeLabel, (char *)nodeLabel);
+                agsafeset(child_node, (char *)"shape", (char *)"record", (char *)"ellipse");
+            }
+            if(parent_node != NULL) {
+                Agedge_t *e = agedge(g, (Agnode_t *)parent_node, (Agnode_t *)child_node, NULL, 1);
+            }
             break;
         case _INT_CONST:
-            strcpy(labelTmp, " \\ | ");
+            memset(agnodeChar,0,sizeof(agnodeChar));
+            child_node = agnode(g, itoa(agnodeNum,agnodeChar,10), 1);
+            agnodeNum++;
             num = T->type_int;
             memset(tmpChar, 0, sizeof(tmpChar));
             itoa(num, tmpChar, 10);
-            strcat(labelTmp, tmpChar);
+            strcpy(nodeLabel, tmpChar);
+            if(child_node != NULL) {
+                agsafeset(child_node, (char *)"label", (char *)nodeLabel, (char *)nodeLabel);
+                agsafeset(child_node, (char *)"shape", (char *)"record", (char *)"ellipse");
+            }
+            if(parent_node != NULL) {
+                Agedge_t *e = agedge(g, (Agnode_t *)parent_node, (Agnode_t *)child_node, NULL, 1);
+            }
             break;
-        default:            
+        default:
+            child_node = parent_node;            
             break;
-    }
-    strcpy(nodeLabel, T->type_node);
-    strcat(nodeLabel, labelTmp);
-    if(child_node != NULL) {
-        agsafeset(child_node, (char *)"label", (char *)nodeLabel, (char *)nodeLabel);
-        agsafeset(child_node, (char *)"shape", (char *)"record", (char *)"ellipse");
-    }
-    if(parent_node != NULL) {
-        // char edge_name[100] = "edge ";
-
-        Agedge_t *e = agedge(g, (Agnode_t *)parent_node, (Agnode_t *)child_node, NULL, 1);
     }
     return child_node;
 }
@@ -72,15 +93,33 @@ void draw_tree(struct node *T, Agraph_t *g, Agnode_t *parent_node)
                 draw_tree(T->ptr[1], g, node);
                 draw_tree(T->ptr[2], g, node);
                 break;
-            case _FUNCTYPE:
+            case _INT:
             case _IDENT:
             case _INT_CONST:
                 node = draw_tree_node(T, g, parent_node);
                 break;
-            case _BLOCK:
             case _STMT:
+            case _RETURN:
+            case _EXP:
+            case _ADDEXP:
+            case _MULEXP:
+            case _UNARYEXP:
+            case _PRIMARYEXP:
+            case _POSI:
+            case _NEGA:
+            case _NOT:
+            case _NUMBER:
                 node = draw_tree_node(T, g, parent_node);
                 draw_tree(T->ptr[0], g, node);
+                break;
+            case _PLUS:
+            case _MINUS:
+            case _MUL:
+            case _DIV:
+            case _MOD:
+                node = draw_tree_node(T, g, parent_node);
+                draw_tree(T->ptr[0], g, node);
+                draw_tree(T->ptr[1], g, node);
                 break;
             default:
                 break;
@@ -96,7 +135,8 @@ int main_tree(struct node *T)
         printf("agopen() failed\n");
         return -1;
     }
-    agsafeset(g, (char *)"rankdir", (char *)"LR", (char *)"LR");
+    // agsafeset(g, (char *)"rankdir", (char *)"LR", (char *)"LR");
+    agsafeset(g, "dpi", "600", "");
     draw_tree(T, g, NULL);
     GVC_t * gv = gvContext();
     if(gv == NULL) {

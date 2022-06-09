@@ -1,7 +1,7 @@
 // #include "sysy.tab.hpp"
 
 typedef enum enum_node_kind {
-    _INT_CONST,_STMT,_BLOCK,_IDENT,_INT,_FUNCDEF,_COMPUNIT,_FUNCTYPE
+    _FUNCDEF,_INT,_IDENT,_STMT,_RETURN,_ADDEXP,_MULEXP,_PLUS,_MINUS,_UNARYEXP,_MUL,_DIV,_MOD,_PRIMARYEXP,_POSI,_NEGA,_NOT,_EXP,_NUMBER,_INT_CONST
 } node_kind;
 
 struct node 
