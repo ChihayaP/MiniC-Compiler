@@ -48,6 +48,14 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 "*"				{ return '*';}
 "/"				{ return '/';}
 "%"				{ return '%';}
+"<"				{ return '<';}
+">"				{ return '>';}
+"<="			{ return LTE;}
+">="			{ return GTE;}
+"=="			{ return EQ;}
+"!="			{ return NEQ;}
+"&&"			{ return AND;}
+"||"			{ return OR;}
 
 {Identifier}    { strcpy(yylval.type_id, yytext); return IDENT;}
 

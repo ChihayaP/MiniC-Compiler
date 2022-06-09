@@ -62,8 +62,14 @@ extern int yydebug;
     YYUNDEF = 257,                 /* "invalid token"  */
     INT = 258,                     /* INT  */
     RETURN = 259,                  /* RETURN  */
-    IDENT = 260,                   /* IDENT  */
-    INT_CONST = 261                /* INT_CONST  */
+    EQ = 260,                      /* EQ  */
+    NEQ = 261,                     /* NEQ  */
+    AND = 262,                     /* AND  */
+    OR = 263,                      /* OR  */
+    GTE = 264,                     /* GTE  */
+    LTE = 265,                     /* LTE  */
+    IDENT = 266,                   /* IDENT  */
+    INT_CONST = 267                /* INT_CONST  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -78,7 +84,7 @@ union YYSTYPE
 	char   type_id[32];
 	struct node *ptr;
 
-#line 82 "parser.tab.h"
+#line 88 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

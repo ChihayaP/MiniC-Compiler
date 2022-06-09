@@ -26,9 +26,13 @@ Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
     char tmpChar[100] = {0};
     Agnode_t *child_node;
     switch (T->kind) {
-        case _MULEXP:            
-        case _ADDEXP:
         case _EXP:
+        case _LOREXP:
+        case _LANDEXP:
+        case _EQEXP:
+        case _RELEXP:
+        case _ADDEXP:
+        case _MULEXP:            
         case _UNARYEXP:
         case _PRIMARYEXP:
         case _NUMBER:
@@ -39,6 +43,14 @@ Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
         case _IDENT:
         case _STMT:
         case _RETURN:
+        case _OR:
+        case _AND:
+        case _EQ:
+        case _NEQ:
+        case _LT:
+        case _GT:
+        case _LTE:
+        case _GTE:
         case _PLUS:
         case _MINUS:
         case _MUL:
@@ -101,6 +113,10 @@ void draw_tree(struct node *T, Agraph_t *g, Agnode_t *parent_node)
             case _STMT:
             case _RETURN:
             case _EXP:
+            case _LOREXP:
+            case _LANDEXP:
+            case _EQEXP:
+            case _RELEXP:
             case _ADDEXP:
             case _MULEXP:
             case _UNARYEXP:
@@ -109,9 +125,18 @@ void draw_tree(struct node *T, Agraph_t *g, Agnode_t *parent_node)
             case _NEGA:
             case _NOT:
             case _NUMBER:
+
                 node = draw_tree_node(T, g, parent_node);
                 draw_tree(T->ptr[0], g, node);
                 break;
+            case _OR:
+            case _AND:
+            case _EQ:
+            case _NEQ:
+            case _LT:
+            case _GT:
+            case _LTE:
+            case _GTE:
             case _PLUS:
             case _MINUS:
             case _MUL:
