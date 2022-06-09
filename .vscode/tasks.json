@@ -1,0 +1,62 @@
+{
+    "tasks": [
+        {
+            "label": "build_debug_dir",
+            "type": "shell",
+            "command": "mkdir",
+            "args": [
+                "-p",
+                "cmake-build-debug"
+            ],
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "powershell.exe"
+                    }
+                },
+                "args": [   // 对于windows系统，传的参数
+                    "-Force",
+                    "cmake-build-debug"
+                ]
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "cmake",
+            "command": "cmake",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "args": [
+                "-S",
+                ".",
+                "-B",
+                "cmake-build-debug",
+                "-DCMAKE_BUILD_TYPE=Debug"
+            ],
+            
+            "dependsOn": [
+                "build_debug_dir" // 在task `build_dir` 后执行该task
+            ]
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "cmake-build-debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "cmake" // 在task `build_dir` 后执行该task
+            ]
+        },
+    ],
+    "version": "2.0.0"
+}

@@ -1,0 +1,3 @@
+D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/CMakeFiles/main.dir
+D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/CMakeFiles/rebuild_cache.dir

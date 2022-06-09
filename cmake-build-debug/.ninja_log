@@ -1,0 +1,20 @@
+# ninja log v5
+8	161	6764497106856172	lex.yy.c	250ec8a51cc78bcd
+8	161	6764497106856172	D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/lex.yy.c	250ec8a51cc78bcd
+2	159	6764497563278975	parser.tab.c	1bd4a41aabddd8a9
+2	159	6764497563278975	D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/parser.tab.h	1bd4a41aabddd8a9
+2	159	6764497563278975	parser.tab.h	1bd4a41aabddd8a9
+170	312	6764497564938662	CMakeFiles/main.dir/main.c.obj	a7f812156a161c3b
+2	159	6764497563278975	D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/parser.tab.c	1bd4a41aabddd8a9
+201	429	6764497109948302	CMakeFiles/main.dir/ast.c.obj	d404dfa277941a7f
+160	350	6764497565318961	CMakeFiles/main.dir/parser.tab.c.obj	e0cbab0139a362d3
+2	110	6764498199683772	lex.yy.c	250ec8a51cc78bcd
+2	110	6764498199683772	D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/lex.yy.c	250ec8a51cc78bcd
+9	173	6764498200088256	parser.tab.c	1bd4a41aabddd8a9
+9	173	6764498200088256	parser.tab.h	1bd4a41aabddd8a9
+9	173	6764498200088256	D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/parser.tab.c	1bd4a41aabddd8a9
+9	173	6764498200088256	D:/ChihayaP/Desktop/MiniC-Compiler/cmake-build-debug/parser.tab.h	1bd4a41aabddd8a9
+193	353	6764498202112942	CMakeFiles/main.dir/main.c.obj	a7f812156a161c3b
+173	399	6764498202572060	CMakeFiles/main.dir/parser.tab.c.obj	e0cbab0139a362d3
+183	530	6764498203889916	CMakeFiles/main.dir/lex.yy.c.obj	19183017fac66304
+530	712	6764498205652288	main.exe	e5dfcacf61b1bdf5
