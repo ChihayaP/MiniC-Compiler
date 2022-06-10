@@ -1,7 +1,12 @@
 // #include "sysy.tab.hpp"
 
 typedef enum enum_node_kind {
-    _FUNCDEF,_INT,_IDENT,_STMT,_RETURN,
+    _FUNCDEF,_INT,
+    _STMT,_RETURN,_LVAL,
+    _BLOCK,_BLOCKITEMNULL,
+    _DECL,_BLOCKITEM,
+    _VARDECL,
+    _IDENT_ONLY,_IDENT_COMMA,
     _LOREXP,
     _LANDEXP,_OR,
     _EQEXP,_AND,

@@ -40,16 +40,33 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 {WhiteSpace}    { /* 忽略, 不做任何操作 */ }
 {LineComment}   { /* 忽略, 不做任何操作 */ }
 
+
+{Decimal}       {yylval.type_int = atoi(yytext); return INT_CONST; }
+{Octal}         {yylval.type_int = atoi(yytext); return INT_CONST; }
+{Hexadecimal}   {yylval.type_int = atoi(yytext); return INT_CONST; }
+
+
 "int"           { return INT; }
 "return"        { return RETURN; }
-"+"				{ return '+';}
-"-"				{ return '-';}
-"!"				{ return '!';}
-"*"				{ return '*';}
-"/"				{ return '/';}
-"%"				{ return '%';}
-"<"				{ return '<';}
-">"				{ return '>';}
+"void"			{ return VOID; }
+
+{Identifier}    { strcpy(yylval.type_id, yytext); return IDENT;}
+
+"+"	|
+"-"	|
+"!"	|
+"*"	|
+"/"	|
+"%"	|
+"<"	|
+">"	|
+","	|
+";"	|
+"{"	|
+"}"	|
+"("	|
+")"				{ return yytext[0]; }
+
 "<="			{ return LTE;}
 ">="			{ return GTE;}
 "=="			{ return EQ;}
@@ -57,11 +74,6 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 "&&"			{ return AND;}
 "||"			{ return OR;}
 
-{Identifier}    { strcpy(yylval.type_id, yytext); return IDENT;}
-
-{Decimal}       {yylval.type_int = atoi(yytext); return INT_CONST; }
-{Octal}         {yylval.type_int = atoi(yytext); return INT_CONST; }
-{Hexadecimal}   {yylval.type_int = atoi(yytext); return INT_CONST; }
 
 .               {return yytext[0];}
 

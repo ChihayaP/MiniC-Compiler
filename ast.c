@@ -26,6 +26,9 @@ Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
     char tmpChar[100] = {0};
     Agnode_t *child_node;
     switch (T->kind) {
+        case _BLOCK:
+        case _DECL:
+        case _STMT:
         case _EXP:
         case _LOREXP:
         case _LANDEXP:
@@ -40,8 +43,12 @@ Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
             break;
         case _FUNCDEF:
         case _INT:
-        case _IDENT:
-        case _STMT:
+        case _BLOCKITEMNULL:
+        case _BLOCKITEM:
+        case _VARDECL:
+        case _IDENT_ONLY:
+        case _IDENT_COMMA:
+        case _LVAL:
         case _RETURN:
         case _OR:
         case _AND:
@@ -98,14 +105,20 @@ void draw_tree(struct node *T, Agraph_t *g, Agnode_t *parent_node)
 {
     Agnode_t *node = NULL;
     if(T != NULL && g != NULL) {
-        switch (T->kind) {
+        node = draw_tree_node(T, g, parent_node);
+        for (int i = 0; i < 3; i++) {
+            if(T->ptr[i] != NULL) {
+                draw_tree(T->ptr[i], g, node);
+            }
+        }
+        /*switch (T->kind) {
             case _FUNCDEF:
                 node = draw_tree_node(T, g, NULL);
                 draw_tree(T->ptr[0], g, node);
                 draw_tree(T->ptr[1], g, node);
-                draw_tree(T->ptr[2], g, node);
+                // draw_tree(T->ptr[2], g, node);
                 break;
-            case _INT:
+            // case _INT:
             case _IDENT:
             case _INT_CONST:
                 node = draw_tree_node(T, g, parent_node);
@@ -148,7 +161,7 @@ void draw_tree(struct node *T, Agraph_t *g, Agnode_t *parent_node)
                 break;
             default:
                 break;
-        }
+        }*/
     }
 }
 
