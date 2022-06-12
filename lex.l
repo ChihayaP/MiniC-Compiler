@@ -49,6 +49,11 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 "int"           { return INT; }
 "return"        { return RETURN; }
 "void"			{ return VOID; }
+"if"			{ return IF; }
+"else"			{ return ELSE; }
+"while"			{ return WHILE; }
+"break"			{ return BREAK; }
+"continue"		{ return CONTINUE; }
 
 {Identifier}    { strcpy(yylval.type_id, yytext); return IDENT;}
 

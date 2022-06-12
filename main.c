@@ -26,6 +26,7 @@ int main(int argc, const char *argv[]) {
     }
 
     yyparse();
+    // drawAst();
     system("pause");
     return 0;
 }

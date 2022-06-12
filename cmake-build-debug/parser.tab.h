@@ -69,8 +69,14 @@ extern int yydebug;
     OR = 264,                      /* OR  */
     GTE = 265,                     /* GTE  */
     LTE = 266,                     /* LTE  */
-    IDENT = 267,                   /* IDENT  */
-    INT_CONST = 268                /* INT_CONST  */
+    IF = 267,                      /* IF  */
+    ELSE = 268,                    /* ELSE  */
+    WHILE = 269,                   /* WHILE  */
+    BREAK = 270,                   /* BREAK  */
+    CONTINUE = 271,                /* CONTINUE  */
+    IDENT = 272,                   /* IDENT  */
+    INT_CONST = 273,               /* INT_CONST  */
+    LT_ELSE = 274                  /* LT_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -85,7 +91,7 @@ union YYSTYPE
 	char   type_id[32];
 	struct node *ptr;
 
-#line 89 "parser.tab.h"
+#line 95 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
