@@ -25,13 +25,17 @@ int yylex();
 };
 
 
-%token INT VOID RETURN EQ NEQ AND OR GTE LTE IF ELSE WHILE BREAK CONTINUE
-%token <type_id> IDENT
+%token INT VOID RETURN AND OR IF ELSE WHILE BREAK CONTINUE
+%token <type_id> IDENT RELOP
 %token <type_int> INT_CONST
 
 // 非终结符的类型定义
-%type <ptr> CompUnit FuncDef FuncType Block Stmt Number Exp UnaryExp PrimaryExp AddExp MulExp LOrExp LAndExp EqExp RelExp Decl BlockItem LVal VarDecl BType Cond VarArray Array FuncFParams FuncFParam
+%type <ptr> CompUnit FuncDef FuncType Block Stmt Number Exp UnaryExp PrimaryExp AddExp MulExp LOrExp LAndExp EqExp Decl LVal VarDecl BType Cond VarArray Array FuncFParams FuncFParam DeclList StmtList
 
+%left RELOP
+%left '-' '+'
+%left '*' '/' '%'
+%right '!'
 %nonassoc LT_ELSE
 %nonassoc ELSE
 
@@ -49,8 +53,10 @@ CompUnit
   ;
 
 FuncDef
-  : FuncType IDENT '(' ')' Block {$$=mknode(_FUNCDEF,$1,$5,NULL,yylineno);strcpy($$->type_id,$2);}
-  | FuncType IDENT '(' FuncFParams ')' Block {$$=mknode(_FUNCDEF,$1,$4,$6,yylineno);strcpy($$->type_id,$2);}
+  : INT IDENT '(' ')' Block               {$$=mknode(_FUNCDEF,$5,NULL,NULL,yylineno);strcpy($$->type_id,$2);$$->type=INT;}
+  | INT IDENT '(' FuncFParams ')' Block   {$$=mknode(_FUNCDEF_PARAMS,$4,$6,NULL,yylineno);strcpy($$->type_id,$2);$$->type=INT;}
+  | VOID IDENT '(' ')' Block              {$$=mknode(_FUNCDEF,$5,NULL,NULL,yylineno);strcpy($$->type_id,$2);$$->type=VOID;}
+  | VOID IDENT '(' FuncFParams ')' Block  {$$=mknode(_FUNCDEF_PARAMS,$4,$6,NULL,yylineno);strcpy($$->type_id,$2);$$->type=VOID;}
   ;
 
 FuncFParams
@@ -65,29 +71,17 @@ FuncFParam
   ;
 
 FuncType
-  : INT   {$$=mknode(_INT,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"int");}
-  | VOID  {$$=mknode(_VOID,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"void");}
-  ;
-
-Block
-  : '{' BlockItem '}' {$$=mknode(_BLOCKITEM,$2,NULL,NULL,yylineno);}
-  | '{' '}'           {$$=mknode(_BLOCKITEMNULL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"\\{\\}");}
-  ;
-
-BlockItem
-  : Decl              {$$=mknode(_DECL,$1,NULL,NULL,yylineno);} 
-  | Stmt              {$$=mknode(_STMT,$1,NULL,NULL,yylineno);}
-  | Decl BlockItem    {$$=mknode(_DECL_BLOCKITEM,$1,$2,NULL,yylineno);strcpy($$->type_id,"blockItem");}
-  | Stmt BlockItem    {$$=mknode(_STMT_BLOCKITEM,$1,$2,NULL,yylineno);strcpy($$->type_id,"blockItem");}
+  : INT   {$$=mknode(_INT,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"int");$$->type=INT;}
+  | VOID  {$$=mknode(_VOID,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"void");$$->type=INT;}
   ;
 
 Decl
-  : BType VarDecl ';' {$$=mknode(_VARDECL,$1,$2,NULL,yylineno);strcpy($$->type_id,"varDecl");}
+  : INT VarDecl ';' {$$=mknode(_VARDECL,$2,NULL,NULL,yylineno);$$->type=INT;strcpy($$->type_id,"varDecl");}
   ;
 
 VarDecl
   : IDENT             {$$=mknode(_IDENT_ONLY_DECL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,$1);}
-  | IDENT ',' VarDecl {$$=mknode(_IDENT_COMMA,$3,NULL,NULL,yylineno);strcpy($$->type_id,strcat($1,","));}
+  | IDENT ',' VarDecl {$$=mknode(_IDENT_COMMA,$3,NULL,NULL,yylineno);strcpy($$->type_id,$1);}
   | IDENT VarArray    {$$=mknode(_IDENT_VARARR,$2,NULL,NULL,yylineno);strcpy($$->type_id,$1);}
   | IDENT VarArray ',' VarDecl {$$=mknode(_IDENT_VARARR_COMMA,$2,$4,NULL,yylineno);strcpy($$->type_id,strcat($1,","));}
   ;
@@ -97,18 +91,33 @@ VarArray
   | '[' INT_CONST ']' VarArray  {$$=mknode(_VARARR_WITH,$4,NULL,NULL,yylineno);$$->type_int,$2;}
   ;
 
+Block
+  : '{' DeclList StmtList '}' {$$=mknode(_BLOCKITEM,$2,$3,NULL,yylineno);}
+  | '{' '}'                   {$$=mknode(_BLOCKITEMNULL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"\\{\\}");}
+  ;
+
+DeclList
+  : {$$=NULL;}
+  | Decl DeclList {$$=mknode(_DECLLIST,$1,$2,NULL,yylineno);}
+  ;
+
+StmtList
+  : {$$=NULL;}
+  | Stmt StmtList {$$=mknode(_STMTLIST,$1,$2,NULL,yylineno);}
+  ;
+
 BType
-  : INT {$$=mknode(_INT,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"int");}
+  : INT {$$=mknode(_INT,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"int");$$->type=INT;}
   ;
 
 Stmt
-  : Block             {$$=mknode(_BLOCK,$1,NULL,NULL,yylineno);}
+  : Block             {$$=$1;}
   | Exp ';'           {$$=mknode(_EXP_SEMI,$1,NULL,NULL,yylineno);}
-  | ';'               {$$=mknode(_SEMI,NULL,NULL,NULL,yylineno);}
+  | ';'               {$$=NULL;}
   | BREAK ';'         {$$=mknode(_BREAK,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"break");}
   | CONTINUE ';'      {$$=mknode(_CONTINUE,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"continue");}
   | RETURN Exp ';'    {$$=mknode(_RETURN,$2,NULL,NULL,yylineno);strcpy($$->type_id,"return");}
-  | RETURN ';'        {$$=mknode(_RETURN_SEMI,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"return;");}
+  | RETURN ';'        {$$=mknode(_RETURN,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"return;");}
   | LVal '=' Exp ';'  {$$=mknode(_LVAL_ASSIGN,$1,$3,NULL,yylineno);strcpy($$->type_id,"=");}
   | WHILE '(' Cond ')' Stmt            {$$=mknode(_WHILE,$3,$5,NULL,yylineno);strcpy($$->type_id,"while");}
   | IF '(' Cond ')' Stmt ELSE Stmt     {$$=mknode(_IF_ELSE,$3,$5,$7,yylineno);strcpy($$->type_id,"if");}
@@ -116,20 +125,20 @@ Stmt
   ;
 
 Cond
-  : LOrExp  {$$=mknode(_COND,$1,NULL,NULL,yylineno);}
+  : LOrExp  {$$=$1;}
   ;
 
 Exp
-  : LOrExp  {$$=mknode(_LOREXP,$1,NULL,NULL,yylineno);}
+  : AddExp  {$$=$1;}
   ;
 
 LOrExp
-  : LAndExp           {$$=mknode(_LANDEXP,$1,NULL,NULL,yylineno);}
+  : LAndExp           {$$=$1;}
   | LOrExp OR LAndExp {$$=mknode(_OR,$1,$3,NULL,yylineno);strcpy($$->type_id,"||");}
   ;
 
 LAndExp
-  : EqExp             {$$=mknode(_EQEXP,$1,NULL,NULL,yylineno);}
+  : EqExp             {$$=$1;}
   | LAndExp AND EqExp {$$=mknode(_AND,$1,$3,NULL,yylineno);strcpy($$->type_id,"&&");}
   ;
 
@@ -144,43 +153,34 @@ Array
   ;
 
 EqExp
-  : RelExp            {$$=mknode(_RELEXP,$1,NULL,NULL,yylineno);}
-  | EqExp EQ RelExp   {$$=mknode(_EQ,$1,$3,NULL,yylineno);strcpy($$->type_id,"==");}
-  | EqExp NEQ RelExp  {$$=mknode(_NEQ,$1,$3,NULL,yylineno);strcpy($$->type_id,"!=");}
-  ;
-
-RelExp
-  : AddExp            {$$=mknode(_ADDEXP,$1,NULL,NULL,yylineno);}
-  | RelExp '<' AddExp {$$=mknode(_LT,$1,$3,NULL,yylineno);strcpy($$->type_id,"\\<");}
-  | RelExp '>' AddExp {$$=mknode(_GT,$1,$3,NULL,yylineno);strcpy($$->type_id,"\\>");}
-  | RelExp LTE AddExp {$$=mknode(_LTE,$1,$3,NULL,yylineno);strcpy($$->type_id,"\\<=");}
-  | RelExp GTE AddExp {$$=mknode(_GTE,$1,$3,NULL,yylineno);strcpy($$->type_id,"\\>=");}
+  : AddExp              {$$=$1;}
+  | AddExp RELOP AddExp {$$=mknode(_RELOP,$1,$3,NULL,yylineno);}
   ;
 
 AddExp
-  : MulExp            {$$=mknode(_MULEXP,$1,NULL,NULL,yylineno);}
+  : MulExp            {$$=$1;}
   | AddExp '+' MulExp {$$=mknode(_PLUS,$1,$3,NULL,yylineno);strcpy($$->type_id,"+");}
   | AddExp '-' MulExp {$$=mknode(_MINUS,$1,$3,NULL,yylineno);strcpy($$->type_id,"-");}
   ;
 
 MulExp
-  : UnaryExp            {$$=mknode(_UNARYEXP,$1,NULL,NULL,yylineno);}
+  : UnaryExp            {$$=$1;}
   | MulExp '*' UnaryExp {$$=mknode(_MUL,$1,$3,NULL,yylineno);strcpy($$->type_id,"*");}
   | MulExp '/' UnaryExp {$$=mknode(_DIV,$1,$3,NULL,yylineno);strcpy($$->type_id,"/");}
   | MulExp '%' UnaryExp {$$=mknode(_MOD,$1,$3,NULL,yylineno);strcpy($$->type_id,"%");}
   ;
 
 UnaryExp
-  : PrimaryExp    {$$=mknode(_PRIMARYEXP,$1,NULL,NULL,yylineno);}
+  : PrimaryExp    {$$=$1;}
   | '+' UnaryExp  {$$=mknode(_POSI,$2,NULL,NULL,yylineno);strcpy($$->type_id,"+");}
   | '-' UnaryExp  {$$=mknode(_NEGA,$2,NULL,NULL,yylineno);strcpy($$->type_id,"-");}
   | '!' UnaryExp  {$$=mknode(_NOT,$2,NULL,NULL,yylineno);strcpy($$->type_id,"!");}
   ;
 
 PrimaryExp
-  : '(' Exp ')' {$$=mknode(_EXP,$2,NULL,NULL,yylineno);}
-  | Number      {$$=mknode(_NUMBER,$1,NULL,NULL,yylineno);}
-  | LVal        {$$=mknode(_LVAL,$1,NULL,NULL,yylineno);}
+  : '(' Exp ')' {$$=$2;}
+  | Number      {$$=$1;}
+  | LVal        {$$=$1;}  
   ;
 
 Number

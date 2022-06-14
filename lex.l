@@ -54,32 +54,36 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 "while"			{ return WHILE; }
 "break"			{ return BREAK; }
 "continue"		{ return CONTINUE; }
-
+                                               
 {Identifier}    { strcpy(yylval.type_id, yytext); return IDENT;}
 
+
+"||"     		{ return OR;}
+"&&"			{return AND;}
 "+"	|
 "-"	|
 "!"	|
 "*"	|
 "/"	|
 "%"	|
-"<"	|
-">"	|
+"=" |
 ","	|
 ";"	|
 "{"	|
 "}"	|
+"[" |
+"]" |
 "("	|
 ")"				{ return yytext[0]; }
 
-"<="			{ return LTE;}
-">="			{ return GTE;}
-"=="			{ return EQ;}
-"!="			{ return NEQ;}
-"&&"			{ return AND;}
-"||"			{ return OR;}
+">" |
+"<" |
+"<=" |			
+">=" |			
+"==" |			
+"!=" 		{ return RELOP;}
 
 
-.               {return yytext[0];}
+
 
 %%

@@ -1,11 +1,6 @@
-int main(){
-    int a, b, c;
-    while (a > 0) {
-        b = c + 1;
-    }
-    return 0;
-}
-
-int test(){
+int main()
+{
+    int a;
+    a = 3 * 4;
     return 0;
 }

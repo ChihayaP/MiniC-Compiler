@@ -2,17 +2,20 @@
 //符号表的大小
 
 typedef enum enum_node_kind {
+    _EXT_DEF_LIST,_EXT_VAR_DEF,
     _COMP_FUNCDEF,_GLO_DECL,_COMP_FUNCDEF_COMP,_GLO_DECL_COMP,
     _FUNCDEF,_FUNCDEF_PARAMS,_FUNCFPARAM,_FUNCFPARAM_COMMA,
     _PARAM,_PARAM_VARARR,_PARAM_NULL,
     _INT,_VOID,
     _BLOCKITEM,_BLOCKITEMNULL,
+    _DECLLIST,_STMTLIST,
     _DECL,_STMT,_DECL_BLOCKITEM,_STMT_BLOCKITEM,
     _VARDECL,
     _IDENT_ONLY_DECL,_IDENT_COMMA,_IDENT_VARARR,_IDENT_VARARR_COMMA,
     _VARARR_ONLY,_VARARR_WITH,
     _BLOCK,_EXP_SEMI,_SEMI,_BREAK,_CONTINUE,_RETURN,_RETURN_SEMI,_LVAL_ASSIGN,_WHILE,_IF_ELSE,_IF,
     _COND,_LOREXP,
+    _RELOP,
     _LANDEXP,_OR,
     _EQEXP,_AND,
     _IDENT_ONLY,_IDENT_ARR,
@@ -23,7 +26,8 @@ typedef enum enum_node_kind {
     _UNARYEXP,_MUL,_DIV,_MOD,
     _PRIMARYEXP,_POSI,_NEGA,_NOT,
     _EXP,_NUMBER,_LVAL,
-    _INT_CONST
+    _INT_CONST,_ARRAY,_IDENT,
+    ID,LABEL,GOTO,FUNCTION,PARAM,ASSIGNOP,NOT,JLT,JLE,JGT,JGE,EQ,NEQ
 } node_kind;
 
 struct opn
@@ -64,13 +68,16 @@ struct node
     int place;                //表示结点对应的变量或运算结果符号表的位置序号
     char Etrue[15],Efalse[15];      //对布尔表达式的翻译时，真假转移目标的标号
     char Snext[15];               //该结点对饮语句执行后的下一条语句位置标号
-    struct codenode *code;         //该结点中间代码链表头指针
+    struct codenode *code;          //该结点中间代码链表头指针
     char op[10];
     int  type;                   //结点对应值的类型
     int pos;                      //语法单位所在位置行号
     int offset;                    //偏移量
     int width;                    //占数据字节数
     int num;                      //变量个数
+    int arrNum;                   //数组维度
+    int arr[20];                  //数组下标
+    int arrTmp[20];                //数组调用时使用
 };
 
 

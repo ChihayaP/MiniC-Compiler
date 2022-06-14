@@ -10,6 +10,9 @@
 // 看起来会很烦人, 于是干脆采用这种看起来 dirty 但实际很有效的手段
 extern FILE *yyin;
 extern int yyparse();
+extern void prnSymbol();
+extern void semanticAnalysisMain();
+extern void printIRMain();
 
 int main(int argc, const char *argv[]) {
   // 解析命令行参数. 测试脚本/评测平台要求你的编译器能接收如下参数:
@@ -27,6 +30,9 @@ int main(int argc, const char *argv[]) {
 
     yyparse();
     // drawAst();
+    // prnSymbol();
+    semanticAnalysisMain();
+    printIRMain();
     system("pause");
     return 0;
 }

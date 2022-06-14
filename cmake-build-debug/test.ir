@@ -1,0 +1,11 @@
+define i32 @main() {
+	declare i32 %l0
+	declare i32 %l1 ; variable: a
+	declare i32 %l2 ; variable: b
+	declare i32 %t3
+	entry
+	%l1 = 12
+	%l0 = 0
+	%t3 = %l0
+	exit %t3
+}
