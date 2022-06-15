@@ -1,11 +1,9 @@
     name  alias    LEV    type flag  varName
-      g1     v1      0     int    G      @g1
-    main     v2      0     int    F    @main
-       b     v3      1     int    P      %l1
-       a     v4      1     int    V      %l2
-      g2     v5      1     int    V      %l3
-          temp1      1     int    T      %t4
-          temp2      1     int    T      %t5
-          temp3      1     int    T      %t6
-          temp4      1     int    T      %t7
+    main     v1      0     int    F    @main
+       a     v2      1     int    V      %l0
+       b     v3      1     int    V      %l1
+          temp1      1     int    T      %t2
+          temp2      1     int    T      %t3
+          temp3      1     int    T      %t4
+          temp4      1     int    T      %t5
 

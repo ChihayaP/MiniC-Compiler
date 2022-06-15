@@ -81,7 +81,7 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 "<=" |			
 ">=" |			
 "==" |			
-"!=" 		{ return RELOP;}
+"!=" 		{ strcpy(yylval.type_id, yytext);return RELOP;}
 
 
 

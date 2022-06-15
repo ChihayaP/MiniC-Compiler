@@ -1,8 +1,7 @@
-int g1[3];
-int main(int b)
+int main()
 {
     int a;
-    int g2[4][5];
-    a = 3 * 4;
+    int b[3];
+    b[2] = a;
     return 0;
 }

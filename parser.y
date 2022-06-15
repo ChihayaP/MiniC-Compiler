@@ -32,7 +32,6 @@ int yylex();
 // 非终结符的类型定义
 %type <ptr> CompUnit FuncDef FuncType Block Stmt Number Exp UnaryExp PrimaryExp AddExp MulExp LOrExp LAndExp EqExp Decl LVal VarDecl BType Cond VarArray Array FuncFParams FuncFParam DeclList StmtList
 
-%left RELOP
 %left '-' '+'
 %left '*' '/' '%'
 %right '!'
@@ -61,7 +60,7 @@ FuncDef
 
 FuncFParams
   : FuncFParam                  {$$=mknode(_FUNCFPARAM,$1,NULL,NULL,yylineno);}
-  | FuncFParam ',' FuncFParams  {$$=mknode(_FUNCFPARAM_COMMA,$1,NULL,NULL,yylineno);strcpy($$->type_id,",");}
+  | FuncFParam ',' FuncFParams  {$$=mknode(_FUNCFPARAM_COMMA,$1,$3,NULL,yylineno);strcpy($$->type_id,",");}
   ;
 
 FuncFParam
@@ -154,7 +153,7 @@ Array
 
 EqExp
   : AddExp              {$$=$1;}
-  | AddExp RELOP AddExp {$$=mknode(_RELOP,$1,$3,NULL,yylineno);}
+  | AddExp RELOP AddExp {$$=mknode(_RELOP,$1,$3,NULL,yylineno);strcpy($$->type_id,$2);}
   ;
 
 AddExp

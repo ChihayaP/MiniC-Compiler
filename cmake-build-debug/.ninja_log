@@ -1,14 +1,14 @@
 # ninja log v5
-478	650	6769871232776967	main.exe	e5dfcacf61b1bdf5
-253	571	6769854554160189	CMakeFiles/main.dir/parser.tab.c.obj	c73876f780157882
-3	126	6768825834381956	lex.yy.c	d8c80f57bdd31aae
-3	240	6769854550744363	D:/Git/MiniC-Compiler/cmake-build-debug/parser.tab.h	a42702219d701fc6
-3	126	6768825834381956	D:/Git/MiniC-Compiler/cmake-build-debug/lex.yy.c	d8c80f57bdd31aae
-3	240	6769854550744363	parser.tab.h	a42702219d701fc6
-2	136	6769871227688246	CMakeFiles/main.dir/main.c.obj	da311fa0b34f8423
-3	240	6769854550744363	parser.tab.c	a42702219d701fc6
-3	240	6769854550744363	D:/Git/MiniC-Compiler/cmake-build-debug/parser.tab.c	a42702219d701fc6
-13	478	6769871231100993	CMakeFiles/main.dir/ast.c.obj	766202c7364f7bf5
-263	630	6769854554752333	CMakeFiles/main.dir/lex.yy.c.obj	b7ba730fff95d849
-2	472	6769873182850052	CMakeFiles/main.dir/ast.c.obj	766202c7364f7bf5
-472	650	6769873184579425	main.exe	e5dfcacf61b1bdf5
+36	355	6770044659976066	CMakeFiles/main.dir/lex.yy.c.obj	b7ba730fff95d849
+3	565	6770105546821316	CMakeFiles/main.dir/ast.c.obj	766202c7364f7bf5
+10	258	6770026780580673	D:/Git/MiniC-Compiler/cmake-build-debug/parser.tab.c	a42702219d701fc6
+10	258	6770026780580673	parser.tab.c	a42702219d701fc6
+24	189	6770044658307733	CMakeFiles/main.dir/main.c.obj	da311fa0b34f8423
+10	258	6770026780580673	parser.tab.h	a42702219d701fc6
+2	175	6770026779972294	D:/Git/MiniC-Compiler/cmake-build-debug/lex.yy.c	d8c80f57bdd31aae
+10	258	6770026780580673	D:/Git/MiniC-Compiler/cmake-build-debug/parser.tab.h	a42702219d701fc6
+2	175	6770026779972294	lex.yy.c	d8c80f57bdd31aae
+13	285	6770044659277227	CMakeFiles/main.dir/parser.tab.c.obj	c73876f780157882
+566	765	6770105548771754	main.exe	e5dfcacf61b1bdf5
+2	533	6770108109668101	CMakeFiles/main.dir/ast.c.obj	766202c7364f7bf5
+534	732	6770108111602701	main.exe	e5dfcacf61b1bdf5

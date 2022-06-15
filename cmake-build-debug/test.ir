@@ -1,14 +1,27 @@
-declare i32 @g1
-define i32 @main(i32 %t0) {
-	declare i32 %l1 ; variable: b
-	declare i32 %l2
-	declare i32 %l3 ; variable: a
-	declare i32 %l4 ; variable: c
+define i32 @main() {
+	declare i32 %l0
+	declare i32 %l1 ; variable: a
+	declare i32 %t2
+	declare i1 %t3
+	declare i32 %t4
 	declare i32 %t5
+	declare i32 %t6
 	entry
-	%l1 = %t0
-	%l3 = 12
-	%l2 = 0
-	%t5 = %l2
-	exit %t5
+	%l1 = 1
+	br label .L3
+.L3:
+	%t2 = %l1
+	%t3 = cmp lt %t2, 3
+	bc %t3, label .L4, label .L6
+.L6:
+	%l0 = 0
+	br label .L2
+.L4:
+	%t4 = %l1
+	%t5 = add %t4, 1
+	%l1 = %t5
+	br label .L3
+.L2:
+	%t6 = %l0
+	exit %t6
 }

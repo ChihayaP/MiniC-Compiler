@@ -1,19 +1,14 @@
-declare i32 @g1[3]
-define i32 @main(i32 %t0) {
-declare i32 %l1
-declare i32 %l2
-declare i32 %l3[4][5]
-declare i32 %t4
-declare i32 %t5
-declare i32 %t6
-declare i32 %t7
-  entry
-  %l1 = %t0
-  %t4 = 3
-  %t5 = 4
-  %t6 = %t4 * %t5
-  %l2 = %t6
-  %t7 = 0
-  exit %t7
+define i32 @main() {
+    declare i32 %l0
+    declare i32 %l1[3]
+    declare i32 %t2
+    declare i32 %t3
+    declare i32* %t4
+    declare i32 %t5
+    entry
+    %t3 = mul %t2, 4
+    %t4 = add %l1, %t3
+    *%t4 = %l0
+    %t5 = 0
+    exit %t5
 }
-LABEL label1 :

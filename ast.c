@@ -335,6 +335,17 @@ char *returnIRName(char *alias)
     return NULL;
 }
 
+int returnVarTablePos(char *alias)
+{
+    int i = 0;
+    for(i=0;i<VarT.index;i++) {
+        if(strcmp(alias,VarT.sym[i].alias)==0){
+            return i;
+        }
+    }
+    return -1;
+}
+
 void prnIR(struct codenode *head){
     int i,j,k;
     char tmpstr1[32]="", tmpstr2[32]="";
@@ -358,26 +369,55 @@ void prnIR(struct codenode *head){
         }
     }
     do {
-        if (h->opn1.kind==INT)
-             sprintf(opnstr1,"%d",h->opn1.const_int);
-        if (h->opn1.kind==ID)
-             sprintf(opnstr1,"%s",returnIRName(h->opn1.id));
-        if (h->opn2.kind==INT)
-             sprintf(opnstr2,"%d",h->opn2.const_int);
-        if (h->opn2.kind==ID)
-             sprintf(opnstr2,"%s",returnIRName(h->opn2.id));
-        sprintf(resultstr,"%s",returnIRName(h->result.id));
+        if (h->opn1.kind==INT) {
+            sprintf(opnstr1,"%d",h->opn1.const_int);
+        } else if (h->opn1.kind==ID) {
+            if(h->opn1.id[0]=='t'&&VarT.sym[returnVarTablePos(h->opn1.id)].isArray==1) {
+                sprintf(opnstr1,"*%s",returnIRName(h->opn1.id));
+            } else {
+                sprintf(opnstr1,"%s",returnIRName(h->opn1.id));
+            }
+        } else {
+            sprintf(opnstr1,"%s",h->opn1.id);
+        }
+        if (h->opn2.kind==INT) {
+            sprintf(opnstr2,"%d",h->opn2.const_int);
+        } else if (h->opn2.kind==ID) {
+            if(h->opn2.id[0]=='t'&&VarT.sym[returnVarTablePos(h->opn2.id)].isArray==1) {
+                sprintf(opnstr2,"*%s",returnIRName(h->opn2.id));
+            } else {
+                sprintf(opnstr2,"%s",returnIRName(h->opn2.id));
+            }
+        } else {
+            sprintf(opnstr2,"%s",h->opn2.id);
+        }
+        if (h->result.kind==ID) {
+            sprintf(resultstr,"%s",returnIRName(h->result.id));
+        } else {
+            sprintf(resultstr,"%s",h->result.id);
+        }
         char c[10];
         switch (h->op) {
-            case ASSIGNOP:  
-                fprintf(fp, "  %s = %s\n",resultstr,opnstr1);
+            case ASSIGNOP:
+                if(VarT.sym[returnVarTablePos(h->result.id)].isArray==1) {
+                    fprintf(fp,"    *%s = %s\n",resultstr,opnstr1);
+                } else 
+                    fprintf(fp, "    %s = %s\n",resultstr,opnstr1);
                 break;
             case _PLUS:
+                fprintf(fp, "    %s = %s %s, %s\n",resultstr,"add",opnstr1,opnstr2);
+                break;
             case _MINUS:
+                fprintf(fp, "    %s = %s %s, %s\n",resultstr,"sub",opnstr1,opnstr2);
+                break;
             case _MUL:
-            case _DIV: 
-                fprintf(fp, "  %s = %s %c %s\n",resultstr,opnstr1, \
-                h->op==_PLUS?'+':h->op==_MINUS?'-':h->op==_MUL?'*':'\\',opnstr2);
+                fprintf(fp, "    %s = %s %s, %s\n",resultstr,"mul",opnstr1,opnstr2);
+                break;
+            case _DIV:
+                fprintf(fp, "    %s = %s %s, %s\n",resultstr,"div",opnstr1,opnstr2);
+                break;
+            case _MOD:
+                fprintf(fp, "    %s = %s %s, %s\n",resultstr,"mod",opnstr1,opnstr2);
                 break;
             case AND:   
 	        case OR:   
@@ -404,18 +444,45 @@ void prnIR(struct codenode *head){
                 if(VarT.sym[i].paramnum == 0) {
                     fprintf(fp, ") {\n");
                 } else {
-                    fprintf(fp,"i32 %s",VarT.sym[i+1].paramName);
+                    if(VarT.sym[i+1].isArray==0) {
+                        fprintf(fp,"i32 %s",VarT.sym[i+1].paramName);
+                    } else {
+                        memset(tmpstr1,0,sizeof(tmpstr1));
+                        memset(tmpstr1,0,sizeof(tmpstr2));
+                        for(k=0;k<VarT.sym[i+1].arrNum;k++) {
+                            strcat(tmpstr1,"[");
+                            strcat(tmpstr1,itoa(VarT.sym[i+1].arr[k],tmpstr2,10));
+                            strcat(tmpstr1,"]");
+                        }
+                        fprintf(fp,"i32 %s%s",VarT.sym[i+1].paramName,tmpstr1);
+                    }
                     for(j=1;j<VarT.sym[i].paramnum;j++) {
-                        fprintf(fp,", i32 %s",VarT.sym[i+1+j].paramName);
+                        if(VarT.sym[i+1+j].isArray==0)
+                            fprintf(fp,", i32 %s",VarT.sym[i+1+j].paramName);
+                        else {
+                            memset(tmpstr1,0,sizeof(tmpstr1));
+                            memset(tmpstr1,0,sizeof(tmpstr2));
+                            for(k=0;k<VarT.sym[i+1+j].arrNum;k++) {
+                                strcat(tmpstr1,"[");
+                                strcat(tmpstr1,itoa(VarT.sym[i+1+j].arr[k],tmpstr2,10));
+                                strcat(tmpstr1,"]");
+                            }
+                            fprintf(fp,", i32 %s%s",VarT.sym[i+1+j].paramName,tmpstr1);
+                        }
                     }
                     fprintf(fp, ") {\n");
                 }
                 j=i;
                 for(i+=1;i<VarT.index;i++) {
-                    if(VarT.sym[i].flag=='V' || VarT.sym[i].flag=='T' || VarT.sym[i].flag=='P') {
+                    if(VarT.sym[i].flag=='V' || VarT.sym[i].flag=='P') {
                         // fprintf(fp,"  declare i32 %s\n",VarT.sym[i].varName);
-                        if(VarT.sym[i].isArray==0)
-                            fprintf(fp,"declare i32 %s\n",VarT.sym[i].varName);
+                        if(VarT.sym[i].isArray==0) {
+                            if(VarT.sym[i].type==INT) {
+                                fprintf(fp,"    declare i32 %s\n",VarT.sym[i].varName);
+                            } else {
+                                fprintf(fp,"    declare i1 %s\n",VarT.sym[i].varName); 
+                            }
+                        }
                         else {
                             memset(tmpstr1,0,sizeof(tmpstr1));
                             memset(tmpstr1,0,sizeof(tmpstr2));
@@ -424,43 +491,66 @@ void prnIR(struct codenode *head){
                                 strcat(tmpstr1,itoa(VarT.sym[i].arr[k],tmpstr2,10));
                                 strcat(tmpstr1,"]");
                             }
-                            fprintf(fp,"declare i32 %s%s\n",VarT.sym[i].varName,tmpstr1);
+                            fprintf(fp,"    declare i32 %s%s\n",VarT.sym[i].varName,tmpstr1);
+                        }
+                    }
+                    if(VarT.sym[i].flag=='T') {
+                        if(VarT.sym[i].isArray==0) {
+                            if(VarT.sym[i].type==INT) {
+                                fprintf(fp,"    declare i32 %s\n",VarT.sym[i].varName);
+                            } else {
+                                fprintf(fp,"    declare i1 %s\n",VarT.sym[i].varName); 
+                            }
+                        } else {
+                            fprintf(fp,"    declare i32* %s\n",VarT.sym[i].varName);
                         }
                     }
                     if(VarT.sym[i].flag=='F' || VarT.sym[i].flag=='G')
                         break;
                 }
-                fprintf(fp, "  entry\n");
+                fprintf(fp, "    entry\n");
                 i=j;
                 if(VarT.sym[i].paramnum != 0) {
                     for(j=0;j<VarT.sym[i].paramnum;j++) {
-                        fprintf(fp,"  %s = %s\n",VarT.sym[i+1+j].varName,VarT.sym[i+1+j].paramName);
+                        fprintf(fp,"    %s = %s\n",VarT.sym[i+1+j].varName,VarT.sym[i+1+j].paramName);
                     }
                 }
                 // printf("\nFUNCTION %s :\n",h->result.id);
                 break;
-            case PARAM:    fprintf(fp, "  PARAM %s\n",h->result.id);
-                           break;
-            case LABEL:    fprintf(fp, "LABEL %s :\n",h->result.id);
-                           break;
-            case GOTO:     fprintf(fp, "  GOTO %s\n",h->result.id);
-                           break;
-            case JLE:      fprintf(fp, "  IF %s <= %s GOTO %s\n",opnstr1,opnstr2,resultstr);
-                           break;
-            case JLT:      fprintf(fp, "  IF %s < %s GOTO %s\n",opnstr1,opnstr2,resultstr);
-                           break;
-            case JGE:      fprintf(fp, "  IF %s >= %s GOTO %s\n",opnstr1,opnstr2,resultstr);
-                           break;
-            case JGT:      fprintf(fp, "  IF %s > %s GOTO %s\n",opnstr1,opnstr2,resultstr);
-                           break;
-            case EQ:       fprintf(fp, "  IF %s == %s GOTO %s\n",opnstr1,opnstr2,resultstr);
-                           break;
-            case NEQ:      fprintf(fp, "  IF %s != %s GOTO %s\n",opnstr1,opnstr2,resultstr);
-                           break;
+            // case PARAM:    
+            //     fprintf(fp, "  PARAM %s\n",h->result.id);
+            //     break;
+            case LABEL:    
+                fprintf(fp, "%s :\n",h->result.id);
+                break;
+            case GOTO:     
+                fprintf(fp, "    br %s\n",resultstr);
+                break;
+            case LE:      
+                fprintf(fp, "    %s = cmp le %s, %s\n",resultstr,opnstr1,opnstr2);
+                break;
+            case LT:      
+                fprintf(fp, "    %s = cmp lt %s, %s\n",resultstr,opnstr1,opnstr2);
+                break;
+            case GE:      
+                fprintf(fp, "    %s = cmp ge %s, %s\n",resultstr,opnstr1,opnstr2);
+                break;
+            case GT:      
+                fprintf(fp, "    %s = cmp gt %s, %s\n",resultstr,opnstr1,opnstr2);
+                break;
+            case EQ:       
+                fprintf(fp, "    %s = cmp eq %s, %s\n",resultstr,opnstr1,opnstr2);
+                break;
+            case NE:
+                fprintf(fp, "    %s = cmp ne %s, %s\n",resultstr,opnstr1,opnstr2);
+                break;
+            case BC:
+                fprintf(fp, "    bc %s, label %s, label %s\n",opnstr1,opnstr2,resultstr);
+                break;
             case RETURN:   if (h->result.kind)
-                                fprintf(fp, "  exit %s\n}\n",resultstr);
+                                fprintf(fp, "    exit %s\n}\n",resultstr);
                            else
-                                fprintf(fp, "  exit\n}\n");
+                                fprintf(fp, "    exit\n}\n");
                            break;
         }
     h=h->next;
@@ -486,7 +576,7 @@ char *newLabel() {
     static int no=1;
     char s[10];
     itoa(no++,s,10);
-    return strcat0("label",s);
+    return strcat0(".L",s);
 }
 
 char *newTemp() {
@@ -563,6 +653,10 @@ void prnVarSymbol()
         if (VarT.sym[i].type==INT)   
         {
             strcpy(ptype,"int");
+        }
+        if (VarT.sym[i].type==BOOL)   
+        {
+            strcpy(ptype,"bool");
         }
         // printf( "%8s %6s %6d  %6s %4c %8s\n",VarT.sym[i].name,
         //         VarT.sym[i].alias,VarT.sym[i].level,
@@ -853,6 +947,37 @@ void Exp(struct node *T)
                 result.offset = SymT.sym[T->ptr[0]->place].offset;
                 T->code = merge(2,T->code,genIR(ASSIGNOP,opn1,opn2,result));
                 break;
+            case _IDENT_ARR:
+                rtn = searchSymbolTable(T->type_id);
+                int a, b;
+                if (rtn == -1)
+                {
+                    semanticError(T->pos, "", "数组变量未定义");
+                }
+                if(SymT.sym[rtn].arrNum == 1) {
+                    Exp(T->ptr[0]->ptr[0]);
+                    opn1.kind = ID;
+                    strcpy(opn1.id, SymT.sym[T->ptr[0]->ptr[0]->place].alias);
+                    opn2.kind = INT;
+                    opn2.const_int = 4;
+                    result.kind = ID;
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    strcpy(result.id, SymT.sym[a].alias);
+                    T->code = genIR(_MUL,opn1,opn2,result);
+                    opn1.kind = ID;
+                    strcpy(opn1.id, SymT.sym[rtn].alias);
+                    opn2.kind = ID;
+                    strcpy(opn2.id, SymT.sym[a].alias);
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    SymT.sym[a].isArray = 1;
+                    result.kind = ID;
+                    strcpy(result.id, SymT.sym[a].alias);
+                    T->code = merge(2,T->code,genIR(_PLUS,opn1,opn2,result));
+                    T->place = a;
+                } else {
+
+                }
+                break;
         }
     }
 }
@@ -877,23 +1002,32 @@ void boolExp(struct node *T)
                 opn2.kind=ID; 
                 strcpy(opn2.id,SymT.sym[T->ptr[1]->place].alias);
                 opn2.offset=SymT.sym[T->ptr[1]->place].offset;
+                rtn=fillTemp(newTemp(),LEV,BOOL,'T',T->offset);
                 result.kind=ID; 
-                strcpy(result.id,T->Etrue);
+                strcpy(result.id,SymT.sym[rtn].alias);
                 if(strcmp(T->type_id, "<") == 0) {
-                    op = JLT;
+                    op = LT;
                 } else if (strcmp(T->type_id, "<=") == 0) {
-                    op = JLE;
+                    op = LE;
                 } else if (strcmp(T->type_id, ">") == 0) {
-                    op = JGT;
+                    op = GT;
                 } else if (strcmp(T->type_id, ">=") == 0) {
-                    op = JGE;
+                    op = GE;
                 } else if (strcmp(T->type_id, "==") == 0) {
                     op = EQ;
                 } else if (strcmp(T->type_id, "!=") == 0) {
-                    op = NEQ;
+                    op = NE;
                 }
                 T->code = genIR(op,opn1,opn2,result);
-                T->code = merge(4,T->ptr[0]->code,T->ptr[1]->code,T->code,genGoto(T->Efalse));
+                op = BC;
+                opn1.kind=ID;
+                strcpy(opn1.id,SymT.sym[rtn].alias);
+                opn1.offset=SymT.sym[rtn].offset;
+                opn2.kind=LABEL; 
+                strcpy(opn2.id,T->Etrue);
+                result.kind=LABEL;
+                strcpy(result.id,T->Efalse);
+                T->code = merge(4,T->ptr[0]->code,T->ptr[1]->code,T->code,genIR(op,opn1,opn2,result));
                 break;
             case _AND:
             case _OR:
@@ -939,10 +1073,19 @@ void boolExp(struct node *T)
                     opn1.offset=SymT.sym[rtn].offset;
                     opn2.kind=INT; 
                     opn2.const_int=0;
+                    rtn=fillTemp(newTemp(),LEV,BOOL,'T',T->offset);
                     result.kind=ID; 
-                    strcpy(result.id,T->Etrue);
-                    T->code=genIR(NEQ,opn1,opn2,result);
-                    T->code=merge(2,T->code,genGoto(T->Efalse));
+                    strcpy(result.id,SymT.sym[rtn].alias);
+                    T->code=genIR(NE,opn1,opn2,result);
+                    op = BC;
+                    opn1.kind=ID;
+                    strcpy(opn1.id,SymT.sym[rtn].alias);
+                    opn1.offset=SymT.sym[rtn].offset;
+                    opn2.kind=LABEL; 
+                    strcpy(opn2.id,T->Etrue);
+                    result.kind=LABEL;
+                    strcpy(result.id,T->Efalse);
+                    T->code=merge(2,T->code,genIR(op,opn1,opn2,result));
                 }
                 T->width=0;
                 break;
@@ -960,8 +1103,8 @@ void boolExp(struct node *T)
 //语法分析，生成符号表
 void semanticAnalysis(struct node *T)
 {
-    int rtn, width, num;
-    struct node *T0;
+    int rtn, width, num, count;
+    struct node *T0, *tmp;
     struct opn opn1, opn2, result;
     if(T) {
         switch(T->kind) {
@@ -1008,10 +1151,11 @@ void semanticAnalysis(struct node *T)
                 T->code = genIR(FUNCTION,opn1,opn2,result);
                 SymT.sym[rtn].paramnum = 0;
                 T->ptr[0]->offset = T->offset;
-                strcpy(T->ptr[0]->Snext, newLabel());
+                // strcpy(T->ptr[0]->Snext, newLabel());
                 semanticAnalysis(T->ptr[0]);
                 SymT.sym[T->place].offset = T->offset + T->ptr[0]->width;
-                T->code = merge(3,T->code,T->ptr[0]->code,genLabel(T->ptr[0]->Snext));
+                // T->code = merge(3,T->code,T->ptr[0]->code,genLabel(T->ptr[0]->Snext));
+                T->code = merge(2,T->code,T->ptr[0]->code);
                 break;
             case _FUNCDEF_PARAMS:
                 T->width = 0;
@@ -1032,11 +1176,12 @@ void semanticAnalysis(struct node *T)
                 SymT.sym[rtn].paramnum = T->ptr[0]->num;
                 T->width += T->ptr[0]->width;
                 T->ptr[1]->offset = T->offset;
-                strcpy(T->ptr[1]->Snext, newLabel());
+                // strcpy(T->ptr[1]->Snext, newLabel());
                 semanticAnalysis(T->ptr[1]);
                 if(T->ptr[1]->ptr[0] != NULL) {
                     SymT.sym[T->place].offset = T->offset + T->ptr[1]->width;
-                    T->code = merge(3,T->code,T->ptr[1]->code,genLabel(T->ptr[1]->Snext));
+                    // T->code = merge(3,T->code,T->ptr[1]->code,genLabel(T->ptr[1]->Snext));
+                    T->code = merge(2,T->code,T->ptr[0]->code);
                 } else {
                     SymT.sym[T->place].offset = T->offset + 0;
                 }
@@ -1065,39 +1210,91 @@ void semanticAnalysis(struct node *T)
                 T->place = rtn;
                 T->num = 1;
                 T->width = 4;
-                result.kind = ID;
-                strcpy(result.id, SymT.sym[rtn].alias);
-                result.offset = T->offset;
-                T->code=genIR(PARAM,opn1,opn2,result);
+                T->code = NULL;
+                // result.kind = ID;
+                // strcpy(result.id, SymT.sym[rtn].alias);
+                // result.offset = T->offset;
+                // T->code=genIR(PARAM,opn1,opn2,result);
+                break;
+            case _PARAM_VARARR:
+                rtn = fillSymbolTable(T->type_id,newAlias(),1,T->ptr[0]->type,'P',T->offset);
+                if(rtn == -1) {
+                    semanticError(T->pos,T->type_id,"参数名重复定义");
+                } else
+                    T->place = rtn;
+                T->num = 1;
+                if(T->ptr[1]->kind==_VARARR_ONLY) {
+                    T->width = 4*T->ptr[1]->type_int;
+                    SymT.sym[rtn].arr[0] = T->ptr[1]->type_int;
+                    SymT.sym[rtn].isArray = 1;
+                    SymT.sym[rtn].arrNum = 1;
+                } else {
+                    tmp = T->ptr[1];
+                    count = 0;
+                    SymT.sym[rtn].isArray = 1;
+                    SymT.sym[rtn].arrNum = 0;
+                    while(tmp != NULL) {
+                        SymT.sym[rtn].arr[count] = tmp->type_int;
+                        tmp = tmp->ptr[0];
+                        count++;
+                        SymT.sym[rtn].arrNum++;
+                    }
+                    T->width = 4;
+                }
+                T->code = NULL;
+                break;
+            case _PARAM_NULL:
+                rtn = fillSymbolTable(T->type_id,newAlias(),1,T->ptr[0]->type,'P',T->offset);
+                if(rtn == -1) {
+                    semanticError(T->pos,T->type_id,"参数名重复定义");
+                } else
+                    T->place = rtn;
+                T->num = 1;
+                if(T->ptr[0]->kind==_VARARR_ONLY) {
+                    T->width = 4*T->ptr[1]->type_int;
+                    SymT.sym[rtn].arr[0] = 0;
+                    SymT.sym[rtn].arr[1] = T->ptr[1]->type_int;
+                    SymT.sym[rtn].isArray = 1;
+                    SymT.sym[rtn].arrNum = 2;
+                } else {
+                    tmp = T->ptr[1];
+                    count = 1;
+                    SymT.sym[rtn].isArray = 1;
+                    SymT.sym[rtn].arr[0] = 0;
+                    SymT.sym[rtn].arrNum = 1;
+                    while(tmp != NULL) {
+                        SymT.sym[rtn].arr[count] = tmp->type_int;
+                        tmp = tmp->ptr[0];
+                        count++;
+                        SymT.sym[rtn].arrNum++;
+                    }
+                    T->width = 4;
+                }
+                T->code = NULL;
                 break;
             case _BLOCKITEM:
             case _BLOCKITEMNULL:
-                if(T->ptr[0] == NULL) {
-                    T->width = 0;
-                    T->code = NULL;
-                } else {
-                    LEV++;
-                    SymbolScope.TX[SymbolScope.top++] = SymT.index;
-                    T->width = 0;
-                    T->code =  NULL;
-                    if(T->ptr[0]) {
-                        T->ptr[0]->offset = T->offset;
-                        semanticAnalysis(T->ptr[0]);
-                        T->width += T->ptr[0]->width;
-                        T->code = T->ptr[0]->code;
-                    }
-                    if(T->ptr[1]) {
-                        T->ptr[1]->offset = T->offset + T->width;
-                        strcpy(T->ptr[1]->Snext,T->Snext);
-                        semanticAnalysis(T->ptr[1]);
-                        T->width += T->ptr[1]->width;
-                        T->code = merge(2,T->code,T->ptr[1]->code);
-                    }
-                    prnSymbol();
-                    symTToVarNameT();
-                    LEV--;
-                    SymT.index = SymbolScope.TX[--SymbolScope.top];
+                LEV++;
+                SymbolScope.TX[SymbolScope.top++] = SymT.index;
+                T->width = 0;
+                T->code =  NULL;
+                if(T->ptr[0]) {
+                    T->ptr[0]->offset = T->offset;
+                    semanticAnalysis(T->ptr[0]);
+                    T->width += T->ptr[0]->width;
+                    T->code = T->ptr[0]->code;
                 }
+                if(T->ptr[1]) {
+                    T->ptr[1]->offset = T->offset + T->width;
+                    strcpy(T->ptr[1]->Snext,T->Snext);
+                    semanticAnalysis(T->ptr[1]);
+                    T->width += T->ptr[1]->width;
+                    T->code = merge(2,T->code,T->ptr[1]->code);
+                }
+                prnSymbol();
+                symTToVarNameT();
+                LEV--;
+                SymT.index = SymbolScope.TX[--SymbolScope.top];
                 break;
             case _DECLLIST:
                 T->code = NULL;
@@ -1211,6 +1408,7 @@ void semanticAnalysis(struct node *T)
 
             case _EXP_SEMI:
             case _IDENT_ONLY:
+            case _IDENT_ARR:
             case _INT_CONST:
             case _OR:
             case _AND:

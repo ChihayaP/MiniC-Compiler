@@ -960,7 +960,7 @@ case 36:
 case 37:
 YY_RULE_SETUP
 #line 84 "../lex.l"
-{ return RELOP;}
+{ strcpy(yylval.type_id, yytext);return RELOP;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
