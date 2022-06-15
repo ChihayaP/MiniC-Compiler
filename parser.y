@@ -87,8 +87,8 @@ VarDecl
   ;
 
 VarArray
-  : '[' INT_CONST ']'           {$$=mknode(_VARARR_ONLY,NULL,NULL,NULL,yylineno);$$->type_int,$2;}
-  | '[' INT_CONST ']' VarArray  {$$=mknode(_VARARR_WITH,$4,NULL,NULL,yylineno);$$->type_int,$2;}
+  : '[' INT_CONST ']'           {$$=mknode(_VARARR_ONLY,NULL,NULL,NULL,yylineno);$$->type_int=$2;}
+  | '[' INT_CONST ']' VarArray  {$$=mknode(_VARARR_WITH,$4,NULL,NULL,yylineno);$$->type_int=$2;}
   ;
 
 Block

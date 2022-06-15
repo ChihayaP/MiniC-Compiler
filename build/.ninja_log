@@ -1,0 +1,12 @@
+# ninja log v5
+1	309	6769617247022652	lex.yy.c	74bc4b9daf426ddc
+1	309	6769617247022652	D:/Git/MiniC-Compiler/build/lex.yy.c	74bc4b9daf426ddc
+13	476	6769617248616233	parser.tab.c	3d0c3c9d77f56a1c
+13	476	6769617248616233	parser.tab.h	3d0c3c9d77f56a1c
+13	476	6769617248616233	D:/Git/MiniC-Compiler/build/parser.tab.c	3d0c3c9d77f56a1c
+13	476	6769617248616233	D:/Git/MiniC-Compiler/build/parser.tab.h	3d0c3c9d77f56a1c
+476	659	6769617250715256	CMakeFiles/main.dir/main.c.obj	1b2bbc7ec7b8ecfa
+499	753	6769617251657765	CMakeFiles/main.dir/parser.tab.c.obj	71337caa842ec853
+512	817	6769617252297260	CMakeFiles/main.dir/lex.yy.c.obj	6a15ce7095e80c64
+488	886	6769617253000141	CMakeFiles/main.dir/ast.c.obj	df85fc364979f078
+887	1099	6769617255078995	main.exe	f38c12e47ba1883a

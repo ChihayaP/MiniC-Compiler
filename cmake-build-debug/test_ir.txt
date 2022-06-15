@@ -1,0 +1,19 @@
+declare i32 @g1[3]
+define i32 @main(i32 %t0) {
+declare i32 %l1
+declare i32 %l2
+declare i32 %l3[4][5]
+declare i32 %t4
+declare i32 %t5
+declare i32 %t6
+declare i32 %t7
+  entry
+  %l1 = %t0
+  %t4 = 3
+  %t5 = 4
+  %t6 = %t4 * %t5
+  %l2 = %t6
+  %t7 = 0
+  exit %t7
+}
+LABEL label1 :

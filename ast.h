@@ -75,11 +75,27 @@ struct node
     int offset;                    //偏移量
     int width;                    //占数据字节数
     int num;                      //变量个数
+
+};
+
+struct symbol 
+{  
+    char name[33];     //变量或函数名
+    int level;   //层号，外部变量名或函数名层号为0，形参名为1，每到1个复合语句层号加1，退出减1
+    int type;           //变量类型或函数返回值类型
+    int paramnum;    //形式参数个数 
+    int listLength[10];  //数组长度
+    char alias[10];      //别名，为解决嵌套层次使用，使得每一个数据名称唯一
+    char flag;          //符号标记，函数：'F'  变量：'V'   参数：'P'  临时变量：'T'
+    char offset;        //外部变量和局部变量在其静态数据区或活动记录中的偏移量
+				    //或函数活动记录大小，目标代码生成时使用
+    int isArray;
     int arrNum;                   //数组维度
     int arr[20];                  //数组下标
     int arrTmp[20];                //数组调用时使用
+    char varName[33];
+    char paramName[10];
 };
-
 
 
 struct node *mknode(node_kind kind,struct node *first,struct node *second, struct node *third,int pos );

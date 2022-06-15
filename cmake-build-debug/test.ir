@@ -1,11 +1,14 @@
-define i32 @main() {
-	declare i32 %l0
-	declare i32 %l1 ; variable: a
-	declare i32 %l2 ; variable: b
-	declare i32 %t3
+declare i32 @g1
+define i32 @main(i32 %t0) {
+	declare i32 %l1 ; variable: b
+	declare i32 %l2
+	declare i32 %l3 ; variable: a
+	declare i32 %l4 ; variable: c
+	declare i32 %t5
 	entry
-	%l1 = 12
-	%l0 = 0
-	%t3 = %l0
-	exit %t3
+	%l1 = %t0
+	%l3 = 12
+	%l2 = 0
+	%t5 = %l2
+	exit %t5
 }

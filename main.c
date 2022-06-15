@@ -27,7 +27,6 @@ int main(int argc, const char *argv[]) {
         printf("Can't open file %s\n", argv[1]);
         return -1;
     }
-
     yyparse();
     // drawAst();
     // prnSymbol();

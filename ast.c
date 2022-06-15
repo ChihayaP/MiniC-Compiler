@@ -14,24 +14,8 @@ struct node *astRoot;           //ast根节点
 int LEV = 0;
 int func_size;
 
-struct symbol 
-{  
-    char name[33];     //变量或函数名
-    int level;   //层号，外部变量名或函数名层号为0，形参名为1，每到1个复合语句层号加1，退出减1
-    int type;           //变量类型或函数返回值类型
-    int paramnum;    //形式参数个数 
-    int listLength[10];  //数组长度
-    char alias[10];      //别名，为解决嵌套层次使用，使得每一个数据名称唯一
-    char flag;          //符号标记，函数：'F'  变量：'V'   参数：'P'  临时变量：'T'
-    char offset;        //外部变量和局部变量在其静态数据区或活动记录中的偏移量
-				    //或函数活动记录大小，目标代码生成时使用
-    int isArray;
-        //其它...
-};
 
 
-
-//符号表
 struct symboltable
 {
     struct symbol sym[MAXLENGTH];
@@ -43,6 +27,183 @@ struct symbol_scope_begin
     int TX[30];
     int top;
 } SymbolScope;
+
+struct VarTable
+{
+    struct symbol sym[MAXLENGTH];
+    int index;
+} VarT;
+
+struct TmpTable
+{
+    struct symbol sym[MAXLENGTH];
+    int index;
+} TmpT;
+
+int searchVarTable(char *alias) 
+{
+    int i;
+    if(VarT.index != 0) {
+        for(i=VarT.index-1;i>=0;i--)
+            if (!strcmp(VarT.sym[i].alias, alias))  
+                return 1;
+    } else
+        return 0;
+    return 0;
+}
+
+void symTToVarNameT()
+{
+    int i = 0, j = VarT.index;
+    int k;
+    for(i=SymT.index-1;i>=0;i--) {
+        if(searchVarTable(SymT.sym[i].alias)==1) {
+            break;
+        }
+    }
+    for(i+=1,j=VarT.index; i<SymT.index; ++i) {
+        strcpy(VarT.sym[j].name,SymT.sym[i].name);
+        strcpy(VarT.sym[j].alias,SymT.sym[i].alias);
+        if(SymT.sym[i].flag == 'V' && SymT.sym[i].level == 0) {
+            VarT.sym[j].flag = 'G';
+        } else {
+            VarT.sym[j].flag=SymT.sym[i].flag;
+        }
+        VarT.sym[j].level = SymT.sym[i].level;
+        VarT.sym[j].type = SymT.sym[i].type;
+        VarT.sym[j].paramnum = SymT.sym[i].paramnum;
+        VarT.sym[j].isArray = SymT.sym[i].isArray;
+        VarT.sym[j].arrNum = SymT.sym[i].arrNum;
+        for(k = 0; k < SymT.sym[i].arrNum; k++) {
+            VarT.sym[j].arr[k] = SymT.sym[i].arr[k];
+        }
+        j++;
+    }
+    VarT.index = j;
+}
+
+void changeVarNameTable(int i, int j, int paramnum)
+{
+    int k,l,m;
+    int varNum = 0;
+    char cTmp[10] = "";
+    char cTmp1[10] = "%l";
+    char cTmp2[10] = "%t";
+    for(k=i+1; k<j; k++) {
+        if(VarT.sym[k].flag=='P') {
+            memset(cTmp,0,sizeof(cTmp));
+            memset(cTmp1,0,sizeof(cTmp1));
+            memset(cTmp2,0,sizeof(cTmp2));
+            strcpy(cTmp1, "%l");
+            strcpy(cTmp2, "%t");
+            itoa(varNum,cTmp,10);
+            strcat(cTmp2,cTmp);
+            strcpy(VarT.sym[k].paramName,cTmp2);
+            itoa(varNum+paramnum,cTmp,10);
+            strcat(cTmp1,cTmp);
+            strcpy(VarT.sym[k].varName,cTmp1);
+            varNum++;
+        }
+    }
+    varNum += paramnum;
+    for(k=i+1+paramnum; k<j; k++) {
+        if(VarT.sym[k].flag=='V') {
+            strcpy(TmpT.sym[TmpT.index].name,VarT.sym[k].name);
+            strcpy(TmpT.sym[TmpT.index].alias,VarT.sym[k].alias);
+            TmpT.sym[TmpT.index].flag=VarT.sym[k].flag;
+            TmpT.sym[TmpT.index].level = VarT.sym[k].level;
+            TmpT.sym[TmpT.index].type = VarT.sym[k].type;
+            TmpT.sym[TmpT.index].isArray = VarT.sym[k].isArray;
+            if(VarT.sym[k].isArray==1) {
+                TmpT.sym[TmpT.index].arrNum = VarT.sym[k].arrNum;
+                for(l = 0; l < VarT.sym[k].arrNum; l++) {
+                    TmpT.sym[TmpT.index].arr[l] = VarT.sym[k].arr[l];
+                }
+            }
+            TmpT.index++;
+        } 
+    }
+    for(k=i+1+paramnum; k<j; k++) {
+        if(VarT.sym[k].flag=='T') {
+            strcpy(TmpT.sym[TmpT.index].name,VarT.sym[k].name);
+            strcpy(TmpT.sym[TmpT.index].alias,VarT.sym[k].alias);
+            TmpT.sym[TmpT.index].flag=VarT.sym[k].flag;
+            TmpT.sym[TmpT.index].level = VarT.sym[k].level;
+            TmpT.sym[TmpT.index].type = VarT.sym[k].type;
+            TmpT.sym[TmpT.index].isArray = VarT.sym[k].isArray;
+            if(VarT.sym[k].isArray==1) {
+                TmpT.sym[TmpT.index].arrNum = VarT.sym[k].arrNum;
+                for(l = 0; l < VarT.sym[k].arrNum; l++) {
+                    TmpT.sym[TmpT.index].arr[l] = VarT.sym[k].arr[l];
+                }
+            }
+            TmpT.index++;
+        } 
+    }
+    for(k=j-1; k>i+paramnum; k--,TmpT.index--) {
+        strcpy(VarT.sym[k].name,TmpT.sym[TmpT.index-1].name);
+        strcpy(VarT.sym[k].alias,TmpT.sym[TmpT.index-1].alias);
+        VarT.sym[k].flag=TmpT.sym[TmpT.index-1].flag;
+        VarT.sym[k].level = TmpT.sym[TmpT.index-1].level;
+        VarT.sym[k].type = TmpT.sym[TmpT.index-1].type;
+        VarT.sym[k].isArray = TmpT.sym[TmpT.index-1].isArray;
+        if(VarT.sym[k].isArray==1) {
+            VarT.sym[k].arrNum = TmpT.sym[TmpT.index-1].arrNum;
+            for(l = 0; l < TmpT.sym[TmpT.index-1].arrNum; l++) {
+                VarT.sym[k].arr[l] = TmpT.sym[TmpT.index-1].arr[l];
+            }
+        }
+    }
+    for(k=i+1+paramnum;k<j;k++) {
+        memset(cTmp,0,sizeof(cTmp));
+        memset(cTmp1,0,sizeof(cTmp1));
+        memset(cTmp2,0,sizeof(cTmp2));
+        strcpy(cTmp1, "%l");
+        strcpy(cTmp2, "%t");
+        if(VarT.sym[k].flag=='V') {
+            itoa(varNum,cTmp,10);
+            strcat(cTmp1,cTmp);
+            strcpy(VarT.sym[k].varName,cTmp1);
+            varNum++;
+        }
+        if(VarT.sym[k].flag=='T') {
+            itoa(varNum,cTmp,10);
+            strcat(cTmp2,cTmp);
+            strcpy(VarT.sym[k].varName,cTmp2);
+            varNum++;
+        }
+    }
+}
+
+void changeFunNameTable()
+{
+    int i, j;
+    char cTmp[33] = "";
+    for(i=0;i<VarT.index;i++) {
+        switch(VarT.sym[i].flag) {
+            case 'G':
+                memset(cTmp,0,sizeof(cTmp));
+                strcpy(cTmp,"@");
+                strcpy(VarT.sym[i].varName, strcat(cTmp,VarT.sym[i].name));
+                break;
+            case 'F':
+                memset(cTmp,0,sizeof(cTmp));
+                strcpy(cTmp,"@");
+                strcpy(VarT.sym[i].varName, strcat(cTmp,VarT.sym[i].name));
+                for(j=i+1;j<VarT.index;j++) {
+                    if(VarT.sym[j].flag=='F')
+                        break;
+                }
+                changeVarNameTable(i,j,VarT.sym[i].paramnum);
+                i=j-1;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+//符号表
 
 struct node * mknode(node_kind kind,struct node *first,struct node *second, struct node *third,int pos ) 
 {
@@ -60,6 +221,8 @@ struct node * mknode(node_kind kind,struct node *first,struct node *second, stru
 void storeAstRoot(struct node *T)
 {
     astRoot = T;
+    VarT.index = 0;
+    TmpT.index = 0;
 }
 
 Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
@@ -161,70 +324,148 @@ void drawAst()
     gvFreeContext(gv);
 }
 
+char *returnIRName(char *alias)
+{
+    int i = 0;
+    for(i=0;i<VarT.index;i++) {
+        if(strcmp(alias,VarT.sym[i].alias)==0){
+            return VarT.sym[i].varName;
+        }
+    }
+    return NULL;
+}
+
 void prnIR(struct codenode *head){
+    int i,j,k;
+    char tmpstr1[32]="", tmpstr2[32]="";
+    FILE *fp = fopen("./cmake-build-debug/test_ir.txt","a");
     char opnstr1[32],opnstr2[32],resultstr[32];
     struct codenode *h=head;
+    for(i=0;i<VarT.index;i++) {
+        if(VarT.sym[i].flag=='G') {
+            if(VarT.sym[i].isArray==0)
+                fprintf(fp,"declare i32 %s\n",VarT.sym[i].varName);
+            else {
+                memset(tmpstr1,0,sizeof(tmpstr1));
+                memset(tmpstr1,0,sizeof(tmpstr2));
+                for(j=0;j<VarT.sym[i].arrNum;j++) {
+                    strcat(tmpstr1,"[");
+                    strcat(tmpstr1,itoa(VarT.sym[i].arr[j],tmpstr2,10));
+                    strcat(tmpstr1,"]");
+                }
+                fprintf(fp,"declare i32 %s%s\n",VarT.sym[i].varName,tmpstr1);
+            }
+        }
+    }
     do {
         if (h->opn1.kind==INT)
-             sprintf(opnstr1,"#%d",h->opn1.const_int);
+             sprintf(opnstr1,"%d",h->opn1.const_int);
         if (h->opn1.kind==ID)
-             sprintf(opnstr1,"%s",h->opn1.id);
+             sprintf(opnstr1,"%s",returnIRName(h->opn1.id));
         if (h->opn2.kind==INT)
-             sprintf(opnstr2,"#%d",h->opn2.const_int);
+             sprintf(opnstr2,"%d",h->opn2.const_int);
         if (h->opn2.kind==ID)
-             sprintf(opnstr2,"%s",h->opn2.id);
-        sprintf(resultstr,"%s",h->result.id);
+             sprintf(opnstr2,"%s",returnIRName(h->opn2.id));
+        sprintf(resultstr,"%s",returnIRName(h->result.id));
         char c[10];
         switch (h->op) {
             case ASSIGNOP:  
-                                printf("  %s := %s\n",resultstr,opnstr1);
-                            break;
+                fprintf(fp, "  %s = %s\n",resultstr,opnstr1);
+                break;
             case _PLUS:
             case _MINUS:
             case _MUL:
             case _DIV: 
-                      printf("  %s := %s %c %s\n",resultstr,opnstr1, \
-                      h->op==_PLUS?'+':h->op==_MINUS?'-':h->op==_MUL?'*':'\\',opnstr2);
-                      break;
+                fprintf(fp, "  %s = %s %c %s\n",resultstr,opnstr1, \
+                h->op==_PLUS?'+':h->op==_MINUS?'-':h->op==_MUL?'*':'\\',opnstr2);
+                break;
             case AND:   
 	        case OR:   
 	        case RELOP: 
-                      if (h->op == AND)
-                        strcpy(c,"&&");
-                      else if (h->op == OR)
-                        strcpy(c,"||");
-                      else
-                        strcpy(c,h->result.rtype);
-                      printf("  %s := %s %s %s\n",resultstr,opnstr1,c,opnstr2);
-                      break;
-            case FUNCTION: printf("\nFUNCTION %s :\n",h->result.id);
+                if (h->op == AND)
+                strcpy(c,"&&");
+                else if (h->op == OR)
+                strcpy(c,"||");
+                else
+                strcpy(c,h->result.rtype);
+                fprintf(fp, "  %s = %s %s %s\n",resultstr,opnstr1,c,opnstr2);
+                break;
+            case FUNCTION: 
+                if(h->result.type == INT) {
+                    fprintf(fp, "define i32 @%s(",h->result.id);
+                } else {
+                    fprintf(fp, "define void @%s(",h->result.id);
+                }
+                for(i=0;i<VarT.index;i++) {
+                    if(strcmp(VarT.sym[i].name,h->result.id)==0) {
+                        break;
+                    }
+                }
+                if(VarT.sym[i].paramnum == 0) {
+                    fprintf(fp, ") {\n");
+                } else {
+                    fprintf(fp,"i32 %s",VarT.sym[i+1].paramName);
+                    for(j=1;j<VarT.sym[i].paramnum;j++) {
+                        fprintf(fp,", i32 %s",VarT.sym[i+1+j].paramName);
+                    }
+                    fprintf(fp, ") {\n");
+                }
+                j=i;
+                for(i+=1;i<VarT.index;i++) {
+                    if(VarT.sym[i].flag=='V' || VarT.sym[i].flag=='T' || VarT.sym[i].flag=='P') {
+                        // fprintf(fp,"  declare i32 %s\n",VarT.sym[i].varName);
+                        if(VarT.sym[i].isArray==0)
+                            fprintf(fp,"declare i32 %s\n",VarT.sym[i].varName);
+                        else {
+                            memset(tmpstr1,0,sizeof(tmpstr1));
+                            memset(tmpstr1,0,sizeof(tmpstr2));
+                            for(k=0;k<VarT.sym[i].arrNum;k++) {
+                                strcat(tmpstr1,"[");
+                                strcat(tmpstr1,itoa(VarT.sym[i].arr[k],tmpstr2,10));
+                                strcat(tmpstr1,"]");
+                            }
+                            fprintf(fp,"declare i32 %s%s\n",VarT.sym[i].varName,tmpstr1);
+                        }
+                    }
+                    if(VarT.sym[i].flag=='F' || VarT.sym[i].flag=='G')
+                        break;
+                }
+                fprintf(fp, "  entry\n");
+                i=j;
+                if(VarT.sym[i].paramnum != 0) {
+                    for(j=0;j<VarT.sym[i].paramnum;j++) {
+                        fprintf(fp,"  %s = %s\n",VarT.sym[i+1+j].varName,VarT.sym[i+1+j].paramName);
+                    }
+                }
+                // printf("\nFUNCTION %s :\n",h->result.id);
+                break;
+            case PARAM:    fprintf(fp, "  PARAM %s\n",h->result.id);
                            break;
-            case PARAM:    printf("  PARAM %s\n",h->result.id);
+            case LABEL:    fprintf(fp, "LABEL %s :\n",h->result.id);
                            break;
-            case LABEL:    printf("LABEL %s :\n",h->result.id);
+            case GOTO:     fprintf(fp, "  GOTO %s\n",h->result.id);
                            break;
-            case GOTO:     printf("  GOTO %s\n",h->result.id);
+            case JLE:      fprintf(fp, "  IF %s <= %s GOTO %s\n",opnstr1,opnstr2,resultstr);
                            break;
-            case JLE:      printf("  IF %s <= %s GOTO %s\n",opnstr1,opnstr2,resultstr);
+            case JLT:      fprintf(fp, "  IF %s < %s GOTO %s\n",opnstr1,opnstr2,resultstr);
                            break;
-            case JLT:      printf("  IF %s < %s GOTO %s\n",opnstr1,opnstr2,resultstr);
+            case JGE:      fprintf(fp, "  IF %s >= %s GOTO %s\n",opnstr1,opnstr2,resultstr);
                            break;
-            case JGE:      printf("  IF %s >= %s GOTO %s\n",opnstr1,opnstr2,resultstr);
+            case JGT:      fprintf(fp, "  IF %s > %s GOTO %s\n",opnstr1,opnstr2,resultstr);
                            break;
-            case JGT:      printf("  IF %s > %s GOTO %s\n",opnstr1,opnstr2,resultstr);
+            case EQ:       fprintf(fp, "  IF %s == %s GOTO %s\n",opnstr1,opnstr2,resultstr);
                            break;
-            case EQ:       printf("  IF %s == %s GOTO %s\n",opnstr1,opnstr2,resultstr);
-                           break;
-            case NEQ:      printf("  IF %s != %s GOTO %s\n",opnstr1,opnstr2,resultstr);
+            case NEQ:      fprintf(fp, "  IF %s != %s GOTO %s\n",opnstr1,opnstr2,resultstr);
                            break;
             case RETURN:   if (h->result.kind)
-                                printf("  RETURN %s\n",resultstr);
+                                fprintf(fp, "  exit %s\n}\n",resultstr);
                            else
-                                printf("  RETURN\n");
+                                fprintf(fp, "  exit\n}\n");
                            break;
         }
     h=h->next;
     } while (h!=head);
+    fclose(fp);
 }
 
 char *strcat0(char *s1,char *s2) {
@@ -293,7 +534,7 @@ void semanticError(int line,char *msg1,char *msg2){
 void prnSymbol()
 {
     int i=0;
-    printf("%6s %6s %6s  %6s %4s %6s\n","name","alias","LEV","type","flag","offset");
+    printf( "%6s %6s %6s  %6s %4s %6s\n","name","alias","LEV","type","flag","offset");
     char ptype[10];
     for(i=0;i<SymT.index;i++)
     {
@@ -301,12 +542,41 @@ void prnSymbol()
         {
             strcpy(ptype,"int");
         }
-        printf("%6s %6s %6d  %6s %4c %6d\n",SymT.sym[i].name,
+        printf( "%8s %6s %6d  %6s %4c %6d\n",SymT.sym[i].name,
                 SymT.sym[i].alias,SymT.sym[i].level,
                 ptype,
                 SymT.sym[i].flag,SymT.sym[i].offset);
         strcpy(ptype,"");
-    }  
+    }
+    printf( "\n"); 
+}
+
+void prnVarSymbol()
+{
+    FILE *fp = fopen("./cmake-build-debug/test.txt","a");
+    int i=0;
+    // printf( "%8s %6s %6s  %6s %4s %8s\n","name","alias","LEV","type","flag","varName");
+    fprintf(fp, "%8s %6s %6s  %6s %4s %8s\n","name","alias","LEV","type","flag","varName");
+    char ptype[10];
+    for(i=0;i<VarT.index;i++)
+    {
+        if (VarT.sym[i].type==INT)   
+        {
+            strcpy(ptype,"int");
+        }
+        // printf( "%8s %6s %6d  %6s %4c %8s\n",VarT.sym[i].name,
+        //         VarT.sym[i].alias,VarT.sym[i].level,
+        //         ptype,
+        //         VarT.sym[i].flag,VarT.sym[i].varName);
+        fprintf(fp, "%8s %6s %6d  %6s %4c %8s\n",VarT.sym[i].name,
+                VarT.sym[i].alias,VarT.sym[i].level,
+                ptype,
+                VarT.sym[i].flag,VarT.sym[i].varName);
+        strcpy(ptype,"");
+    }
+    // printf( "\n");
+    fprintf(fp, "\n");
+    fclose(fp);  
 }
 
 int searchSymbolTable(char *name) 
@@ -373,6 +643,9 @@ struct codenode *merge(int num, ...)
 void extVarList(struct node *T) 
 {
     int rtn, num = 1;
+    int plusWidth = 1;
+    int count = 0;
+    struct node *tmp;
     switch(T->kind) {
         case _IDENT_ONLY_DECL:
             rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'V',T->offset);
@@ -403,11 +676,34 @@ void extVarList(struct node *T)
             } else {
                 T->place = rtn;
             }
-            T->ptr[0]->type = T->type;
-            T->ptr[0]->offset = T->offset + T->width;
-            T->ptr[0]->width = T->width;
-            extVarList(T->ptr[0]);
-            T->num = T->ptr[0]->num + 1;
+            if(T->ptr[0]->kind==_VARARR_ONLY) {
+                T->width = 4*T->ptr[0]->type_int;
+                SymT.sym[rtn].arr[0] = T->ptr[0]->type_int;
+                SymT.sym[rtn].arrTmp[0] = 1;
+                SymT.sym[rtn].isArray = 1;
+                SymT.sym[rtn].arrNum = 1;
+            } else {
+                tmp = T->ptr[0];
+                count = 0;
+                SymT.sym[rtn].isArray = 1;
+                SymT.sym[rtn].arrNum = 0;
+                while(tmp->ptr[0] != NULL) {
+                    SymT.sym[rtn].arr[count] = tmp->type_int;
+                    tmp = tmp->ptr[0];
+                    count++;
+                    SymT.sym[rtn].arrNum++;
+                }
+                SymT.sym[rtn].arrTmp[SymT.sym[rtn].arrNum-1] = 1;
+                for(int i=SymT.sym[rtn].arrNum-2; i>=0; i--) {
+                    SymT.sym[rtn].arrTmp[i] = SymT.sym[rtn].arrTmp[i+1]*SymT.sym[rtn].arr[i+1];
+                }
+                T->width = 4*SymT.sym[rtn].arrTmp[0]*SymT.sym[rtn].arr[0];
+            }
+            T->ptr[1]->type = T->type;
+            T->ptr[1]->offset = T->offset + T->width;
+            T->ptr[1]->width = T->width;
+            extVarList(T->ptr[1]);
+            T->num = T->ptr[1]->num + 1;
             break;
         case _IDENT_VARARR:
             rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'V',T->offset*(T->ptr[0]->type_int));
@@ -417,6 +713,29 @@ void extVarList(struct node *T)
                 T->place = rtn;
             }
             T->num = 1;
+            if(T->ptr[0]->kind==_VARARR_ONLY) {
+                T->width = 4*T->ptr[0]->type_int;
+                SymT.sym[rtn].arr[0] = T->ptr[0]->type_int;
+                SymT.sym[rtn].arrTmp[0] = 1;
+                SymT.sym[rtn].isArray = 1;
+                SymT.sym[rtn].arrNum = 1;
+            } else {
+                tmp = T->ptr[0];
+                count = 0;
+                SymT.sym[rtn].isArray = 1;
+                SymT.sym[rtn].arrNum = 0;
+                while(tmp != NULL) {
+                    SymT.sym[rtn].arr[count] = tmp->type_int;
+                    tmp = tmp->ptr[0];
+                    count++;
+                    SymT.sym[rtn].arrNum++;
+                }
+                SymT.sym[rtn].arrTmp[SymT.sym[rtn].arrNum-1] = 1;
+                for(int i=SymT.sym[rtn].arrNum-2; i>=0; i--) {
+                    SymT.sym[rtn].arrTmp[i] = SymT.sym[rtn].arrTmp[i+1]*SymT.sym[rtn].arr[i+1];
+                }
+                T->width = 4*SymT.sym[rtn].arrTmp[0]*SymT.sym[rtn].arr[0];
+            }
             break;
     }
 }
@@ -429,8 +748,8 @@ void Exp(struct node *T)
     if (T) {
         switch (T->kind) {
             case _INT_CONST:
-                T->place = fillTemp(newTemp(),LEV,T->type,'T',T->offset);
                 T->type = INT;
+                T->place = fillTemp(newTemp(),LEV,T->type,'T',T->offset);
                 opn1.kind = INT;
                 opn1.const_int = T->type_int;
                 result.kind = ID;
@@ -685,6 +1004,7 @@ void semanticAnalysis(struct node *T)
                 result.kind = ID;
                 strcpy(result.id,T->type_id);
                 result.offset = rtn;
+                result.type = T->type;
                 T->code = genIR(FUNCTION,opn1,opn2,result);
                 SymT.sym[rtn].paramnum = 0;
                 T->ptr[0]->offset = T->offset;
@@ -705,10 +1025,12 @@ void semanticAnalysis(struct node *T)
                 result.kind = ID;
                 strcpy(result.id,T->type_id);
                 result.offset = rtn;
+                result.type = T->type;
                 T->code = genIR(FUNCTION,opn1,opn2,result);
                 T->ptr[0]->offset = T->offset;
                 semanticAnalysis(T->ptr[0]);
-                T->offset += T->ptr[0]->width;
+                SymT.sym[rtn].paramnum = T->ptr[0]->num;
+                T->width += T->ptr[0]->width;
                 T->ptr[1]->offset = T->offset;
                 strcpy(T->ptr[1]->Snext, newLabel());
                 semanticAnalysis(T->ptr[1]);
@@ -772,6 +1094,7 @@ void semanticAnalysis(struct node *T)
                         T->code = merge(2,T->code,T->ptr[1]->code);
                     }
                     prnSymbol();
+                    symTToVarNameT();
                     LEV--;
                     SymT.index = SymbolScope.TX[--SymbolScope.top];
                 }
@@ -907,10 +1230,23 @@ void semanticAnalysis(struct node *T)
 
 void semanticAnalysisMain()
 {
+    FILE *fp = fopen("./cmake-build-debug/test.txt","w");
+    if(fp != NULL)
+    {
+        fclose(fp);
+    }
+    fp = fopen("./cmake-build-debug/test_ir.txt","w");
+    if(fp != NULL)
+    {
+        fclose(fp);
+    }
     SymbolScope.TX[0] = 0;
     SymbolScope.top = 1;
     astRoot->offset = 0;
     semanticAnalysis(astRoot);
+    // prnVarSymbol();
+    changeFunNameTable();
+    prnVarSymbol();
 }
 
 void printIRMain()

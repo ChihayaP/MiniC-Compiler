@@ -1317,13 +1317,13 @@ yyreduce:
 
   case 21: /* VarArray: '[' INT_CONST ']'  */
 #line 90 "../parser.y"
-                                {(yyval.ptr)=mknode(_VARARR_ONLY,NULL,NULL,NULL,yylineno);(yyval.ptr)->type_int=(yyvsp[-1].type_int);}
+                                {(yyval.ptr)=mknode(_VARARR_ONLY,NULL,NULL,NULL,yylineno);(yyval.ptr)->type_int,(yyvsp[-1].type_int);}
 #line 1322 "parser.tab.c"
     break;
 
   case 22: /* VarArray: '[' INT_CONST ']' VarArray  */
 #line 91 "../parser.y"
-                                {(yyval.ptr)=mknode(_VARARR_WITH,(yyvsp[0].ptr),NULL,NULL,yylineno);(yyval.ptr)->type_int=(yyvsp[-2].type_int);}
+                                {(yyval.ptr)=mknode(_VARARR_WITH,(yyvsp[0].ptr),NULL,NULL,yylineno);(yyval.ptr)->type_int,(yyvsp[-2].type_int);}
 #line 1328 "parser.tab.c"
     break;
 

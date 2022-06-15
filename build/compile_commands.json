@@ -1,0 +1,22 @@
+[
+{
+  "directory": "D:/Git/MiniC-Compiler/build",
+  "command": "D:\\CompilerTools64\\msys64\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz -g -o CMakeFiles\\main.dir\\parser.tab.c.obj -c D:\\Git\\MiniC-Compiler\\build\\parser.tab.c",
+  "file": "D:\\Git\\MiniC-Compiler\\build\\parser.tab.c"
+},
+{
+  "directory": "D:/Git/MiniC-Compiler/build",
+  "command": "D:\\CompilerTools64\\msys64\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz -g -o CMakeFiles\\main.dir\\lex.yy.c.obj -c D:\\Git\\MiniC-Compiler\\build\\lex.yy.c",
+  "file": "D:\\Git\\MiniC-Compiler\\build\\lex.yy.c"
+},
+{
+  "directory": "D:/Git/MiniC-Compiler/build",
+  "command": "D:\\CompilerTools64\\msys64\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz -g -o CMakeFiles\\main.dir\\main.c.obj -c D:\\Git\\MiniC-Compiler\\main.c",
+  "file": "D:\\Git\\MiniC-Compiler\\main.c"
+},
+{
+  "directory": "D:/Git/MiniC-Compiler/build",
+  "command": "D:\\CompilerTools64\\msys64\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz -g -o CMakeFiles\\main.dir\\ast.c.obj -c D:\\Git\\MiniC-Compiler\\ast.c",
+  "file": "D:\\Git\\MiniC-Compiler\\ast.c"
+}
+]
