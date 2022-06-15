@@ -836,7 +836,7 @@ void extVarList(struct node *T)
 
 void Exp(struct node *T)
 {
-    int rtn, num, width;
+    int rtn, num, width, count;
     struct node *T0;
     struct opn opn1, opn2, result;
     if (T) {
@@ -956,6 +956,7 @@ void Exp(struct node *T)
                 }
                 if(SymT.sym[rtn].arrNum == 1) {
                     Exp(T->ptr[0]->ptr[0]);
+                    T->code = T->ptr[0]->ptr[0]->code;
                     opn1.kind = ID;
                     strcpy(opn1.id, SymT.sym[T->ptr[0]->ptr[0]->place].alias);
                     opn2.kind = INT;
@@ -963,7 +964,7 @@ void Exp(struct node *T)
                     result.kind = ID;
                     a = fillTemp(newTemp(),LEV,INT,'T',4);
                     strcpy(result.id, SymT.sym[a].alias);
-                    T->code = genIR(_MUL,opn1,opn2,result);
+                    T->code = merge(2,T->code,genIR(_MUL,opn1,opn2,result));
                     opn1.kind = ID;
                     strcpy(opn1.id, SymT.sym[rtn].alias);
                     opn2.kind = ID;
@@ -975,7 +976,62 @@ void Exp(struct node *T)
                     T->code = merge(2,T->code,genIR(_PLUS,opn1,opn2,result));
                     T->place = a;
                 } else {
-
+                    T0=T->ptr[0];
+                    count = 0;
+                    Exp(T0->ptr[0]);
+                    T->code = T0->ptr[0]->code;
+                    opn1.kind=ID;
+                    strcpy(opn1.id,SymT.sym[T0->ptr[0]->place].alias);
+                    opn2.kind=INT;
+                    opn2.const_int=SymT.sym[rtn].arrTmp[count];
+                    count++;
+                    result.kind=ID;
+                    a=fillTemp(newTemp(),LEV,INT,'T',4);
+                    result.kind=ID;
+                    strcpy(result.id,SymT.sym[a].alias);
+                    T->code=merge(2,T->code,genIR(_MUL,opn1,opn2,result));
+                    T0=T0->ptr[1];
+                    while(T0!=NULL) {
+                        Exp(T0->ptr[0]);
+                        T->code=merge(2,T->code,T0->ptr[0]->code);
+                        opn1.kind=ID;
+                        strcpy(opn1.id,SymT.sym[T0->ptr[0]->place].alias);
+                        opn2.kind=INT;
+                        opn2.const_int=SymT.sym[rtn].arrTmp[count];
+                        count++;
+                        result.kind=ID;
+                        b=fillTemp(newTemp(),LEV,INT,'T',4);
+                        result.kind=ID;
+                        strcpy(result.id,SymT.sym[b].alias);
+                        T->code=merge(2,T->code,genIR(_MUL,opn1,opn2,result));
+                        opn1.kind=ID;
+                        opn2.kind=ID;
+                        strcpy(opn1.id,SymT.sym[a].alias);
+                        strcpy(opn2.id,SymT.sym[b].alias);
+                        result.kind=ID;
+                        a=fillTemp(newTemp(),LEV,INT,'T',4);
+                        strcpy(result.id,SymT.sym[a].alias);
+                        T->code=merge(2,T->code,genIR(_PLUS,opn1,opn2,result));
+                        T0=T0->ptr[1];
+                    }
+                    opn1.kind = ID;
+                    strcpy(opn1.id, SymT.sym[a].alias);
+                    opn2.kind = INT;
+                    opn2.const_int = 4;
+                    result.kind = ID;
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    strcpy(result.id, SymT.sym[a].alias);
+                    T->code = merge(2,T->code,genIR(_MUL,opn1,opn2,result));
+                    opn1.kind = ID;
+                    strcpy(opn1.id, SymT.sym[rtn].alias);
+                    opn2.kind = ID;
+                    strcpy(opn2.id, SymT.sym[a].alias);
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    SymT.sym[a].isArray = 1;
+                    result.kind = ID;
+                    strcpy(result.id, SymT.sym[a].alias);
+                    T->code = merge(2,T->code,genIR(_PLUS,opn1,opn2,result));
+                    T->place = a;
                 }
                 break;
         }

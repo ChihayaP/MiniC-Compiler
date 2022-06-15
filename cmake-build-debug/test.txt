@@ -6,4 +6,8 @@
           temp2      1     int    T      %t3
           temp3      1     int    T      %t4
           temp4      1     int    T      %t5
+          temp5      1     int    T      %t6
+          temp6      1     int    T      %t7
+          temp7      1     int    T      %t8
+          temp8      1     int    T      %t9
 
