@@ -30,7 +30,7 @@ int yylex();
 %token <type_int> INT_CONST
 
 // 非终结符的类型定义
-%type <ptr> CompUnit FuncDef FuncType Block Stmt Number Exp UnaryExp PrimaryExp AddExp MulExp LOrExp LAndExp EqExp Decl LVal VarDecl BType Cond VarArray Array FuncFParams FuncFParam DeclList StmtList
+%type <ptr> CompUnit FuncDef Block Stmt Number Exp UnaryExp PrimaryExp AddExp MulExp LOrExp LAndExp EqExp Decl LVal VarDecl BType Cond VarArray Array FuncFParams FuncFParam DeclList StmtList Args
 
 %left '-' '+'
 %left '*' '/' '%'
@@ -66,13 +66,14 @@ FuncFParams
 FuncFParam
   : BType IDENT                   {$$=mknode(_PARAM,$1,NULL,NULL,yylineno);strcpy($$->type_id,$2);}
   | BType IDENT VarArray          {$$=mknode(_PARAM_VARARR,$1,$3,NULL,yylineno);strcpy($$->type_id,$2);}
+  | BType IDENT '[' ']'           {$$=mknode(_PARAM_NULL,$1,NULL,NULL,yylineno);strcpy($$->type_id,$2);}
   | BType IDENT '[' ']' VarArray  {$$=mknode(_PARAM_NULL,$1,$5,NULL,yylineno);strcpy($$->type_id,$2);}
   ;
 
-FuncType
+/* FuncType
   : INT   {$$=mknode(_INT,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"int");$$->type=INT;}
   | VOID  {$$=mknode(_VOID,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"void");$$->type=INT;}
-  ;
+  ; */
 
 Decl
   : INT VarDecl ';' {$$=mknode(_VARDECL,$2,NULL,NULL,yylineno);$$->type=INT;strcpy($$->type_id,"varDecl");}
@@ -179,7 +180,14 @@ UnaryExp
 PrimaryExp
   : '(' Exp ')' {$$=$2;}
   | Number      {$$=$1;}
-  | LVal        {$$=$1;}  
+  | LVal        {$$=$1;}
+  | IDENT '(' ')'       {$$=mknode(_FUNC_CALL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,$1);}
+  | IDENT '(' Args ')'  {$$=mknode(_FUNC_CALL,$3,NULL,NULL,yylineno);strcpy($$->type_id,$1);}  
+  ;
+
+Args
+  : Exp ',' Args  {$$=mknode(_ARGS,$1,$3,NULL,yylineno);}
+  | Exp           {$$=mknode(_ARGS,$1,NULL,NULL,yylineno);}
   ;
 
 Number

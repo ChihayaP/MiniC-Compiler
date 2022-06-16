@@ -1,7 +1,11 @@
-int main()
+void test(int a, int b[3][4])
 {
+
+}
+int main()
+{   
     int a;
     int b[3][4];
-    b[1][2] = a;
+    test(a,b);
     return 0;
 }
