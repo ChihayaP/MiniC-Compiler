@@ -35,7 +35,7 @@ add_custom_command(OUTPUT
     parser.y
 )
 
-find_package(Pkgconfig REQUIRED)
+find_package(PkgConfig REQUIRED)
 IF(PKG_CONFIG_FOUND)
     INCLUDE(FindPkgConfig)
     PKG_CHECK_MODULES(LIBGVC libgvc)

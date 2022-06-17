@@ -1,0 +1,12 @@
+    name  alias    LEV    type flag  varName
+  ifElse     v1      0     int    F  @ifElse
+       a     v2      1     int    V      %l0
+          temp1      1     int    T      %t1
+          temp2      1     int    T      %t2
+          temp3      1    bool    T      %t3
+          temp4      2     int    T      %t4
+          temp5      2     int    T      %t5
+          temp6      2     int    T      %t6
+    main     v3      0     int    F    @main
+          temp7      1     int    T      %t0
+

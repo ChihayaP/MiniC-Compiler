@@ -420,6 +420,9 @@ void prnIR(struct codenode *head){
             case _MOD:
                 fprintf(fp, "    %s = %s %s, %s\n",resultstr,"mod",opnstr1,opnstr2);
                 break;
+            case _NEGA:
+                fprintf(fp, "    %s = %s %s\n",resultstr,"neg",opnstr1);
+                break;
             case AND:   
 	        case OR:   
 	        case RELOP: 
@@ -543,7 +546,7 @@ void prnIR(struct codenode *head){
             //     fprintf(fp, "  PARAM %s\n",h->result.id);
             //     break;
             case CALL:
-                if(h->result.type == INT) {
+                if(h->opn1.type == INT) {
                     fprintf(fp, "    %s = call i32 %s(",resultstr,opnstr1);
                 } else {
                     fprintf(fp, "    call void %s(",opnstr1);
@@ -693,7 +696,7 @@ struct codenode *genGoto(char *label){
 
 void semanticError(int line,char *msg1,char *msg2){
     //这里可以只收集错误信息，最后在一次显示
-    printf("在%d行,%s %s\n",line,msg1,msg2);
+    printf("On%dline,%s %s\n",line,msg1,msg2);
 }
 
 //显示符号表
@@ -702,7 +705,7 @@ void prnSymbol()
     int i=0;
     printf( "%6s %6s %6s  %6s %4s %6s\n","name","alias","LEV","type","flag","offset");
     char ptype[10];
-    for(i=0;i<SymT.index;i++)
+    for(i=11;i<SymT.index;i++)
     {
         if (SymT.sym[i].type==INT)   
         {
@@ -724,7 +727,7 @@ void prnVarSymbol()
     // printf( "%8s %6s %6s  %6s %4s %8s\n","name","alias","LEV","type","flag","varName");
     fprintf(fp, "%8s %6s %6s  %6s %4s %8s\n","name","alias","LEV","type","flag","varName");
     char ptype[10];
-    for(i=0;i<VarT.index;i++)
+    for(i=11;i<VarT.index;i++)
     {
         if (VarT.sym[i].type==INT)   
         {
@@ -798,6 +801,8 @@ struct codenode *merge(int num, ...)
         if (h1==NULL) 
             h1=h2;
         else if (h2){
+            // if(h1->prior==NULL)
+            //     return h2;
             t1=h1->prior;
             t2=h2->prior;
             t1->next=h2;
@@ -819,20 +824,20 @@ int  matchParam(int i,struct node *T){
     {
         if (!T)
         {
-            semanticError(T->pos,"", "函数调用参数太少");
+            semanticError(T->pos,"", "Too few arguments to function call\n");
             return 0;
         }
         type1=SymT.sym[i+j].type;  //形参类型
         type2=T->ptr[0]->type;
         if (type1!=type2)
         {
-            semanticError(T->pos,"", "参数类型不匹配");
+            semanticError(T->pos,"", "parameter type mismatch\n");
             return 0;
         }
         T=T->ptr[1];
     }
     if (T->ptr[1]){ //num个参数已经匹配完，还有实参表达式
-        semanticError(T->pos,"", "函数调用参数太多");
+        semanticError(T->pos,"", "Too many arguments to function call\n");
         return 0;
     }
     return 1;
@@ -848,7 +853,7 @@ void extVarList(struct node *T)
         case _IDENT_ONLY_DECL:
             rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'V',T->offset);
             if(rtn == -1) {
-                semanticError(T->pos, T->type_id, "变量重复定义\n");
+                semanticError(T->pos, T->type_id, "Variables are defined repeatedly\n");
             } else {
                 T->place = rtn;
             }
@@ -857,7 +862,7 @@ void extVarList(struct node *T)
         case _IDENT_COMMA:
             rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'V',T->offset);
             if(rtn == -1) {
-                semanticError(T->pos, T->type_id, "变量重复定义\n");
+                semanticError(T->pos, T->type_id, "Variables are defined repeatedly\n");
             } else {
                 T->place = rtn;
             }
@@ -870,7 +875,7 @@ void extVarList(struct node *T)
         case _IDENT_VARARR_COMMA:
             rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'V',T->offset*(T->ptr[0]->type_int));
             if(rtn == -1) {
-                semanticError(T->pos, T->type_id, "变量重复定义\n");
+                semanticError(T->pos, T->type_id, "Variables are defined repeatedly\n");
             } else {
                 T->place = rtn;
             }
@@ -906,7 +911,7 @@ void extVarList(struct node *T)
         case _IDENT_VARARR:
             rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'V',T->offset*(T->ptr[0]->type_int));
             if(rtn == -1) {
-                semanticError(T->pos, T->type_id, "变量重复定义\n");
+                semanticError(T->pos, T->type_id, "Variables are defined repeatedly\n");
             } else {
                 T->place = rtn;
             }
@@ -958,13 +963,13 @@ void Exp(struct node *T)
             case _IDENT_ONLY:
                 rtn = searchSymbolTable(T->type_id);
                 if(rtn == -1) {
-                    semanticError(T->pos,T->type_id,"变量未定义");
+                    semanticError(T->pos,T->type_id,"The variable is undefined\n");
                 }
                 if(SymT.sym[rtn].isArray == 1) {
-                    semanticError(T->pos,T->type_id, "不能对数组名赋值");
+                    semanticError(T->pos,T->type_id, "Array names cannot be assigned values\n");
                 }
                 if(SymT.sym[rtn].flag == 'F') {
-                    semanticError(T->pos,T->type_id, "是函数名，类型不匹配");
+                    semanticError(T->pos,T->type_id, "It's the function name, the type does not match\n");
                 } else {
                     T->place = rtn;
                     T->code = NULL;
@@ -997,6 +1002,18 @@ void Exp(struct node *T)
                 result.type=T->type;
                 result.offset=SymT.sym[T->place].offset;
                 T->code=merge(3,T->ptr[0]->code,T->ptr[1]->code,genIR(T->kind,opn1,opn2,result));
+                break;
+            case _NEGA:
+                Exp(T->ptr[0]);
+                T->type=T->ptr[0]->type;
+                T->width=T->ptr[0]->width+4;
+                T->ptr[0]->offset=T->offset;
+                T->place=fillTemp(newTemp(),LEV,T->type,'T',T->offset);
+                opn1.kind=ID;
+                result.kind=ID;
+                strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
+                strcpy(result.id,SymT.sym[T->place].alias);
+                T->code=merge(2,T->ptr[0]->code,genIR(T->kind,opn1,opn2,result));
                 break;
             case _NOT:
                 Exp(T->ptr[0]);
@@ -1056,7 +1073,7 @@ void Exp(struct node *T)
                 int a, b;
                 if (rtn == -1)
                 {
-                    semanticError(T->pos, "", "数组变量未定义");
+                    semanticError(T->pos, "", "Array variables are undefined\n");
                 }
                 if(SymT.sym[rtn].arrNum == 1) {
                     Exp(T->ptr[0]->ptr[0]);
@@ -1141,11 +1158,11 @@ void Exp(struct node *T)
             case _FUNC_CALL:
                 rtn=searchSymbolTable(T->type_id);
                 if(rtn==-1) {
-                    semanticError(T->pos,T->type_id,"函数未定义");
+                    semanticError(T->pos,T->type_id,"The function is undefined\n");
                     break;
                 }
                 if(SymT.sym[rtn].flag!='F') {
-                    semanticError(T->pos,T->type_id,"不是一个函数");
+                    semanticError(T->pos,T->type_id,"Not a function\n");
                     break;
                 }
                 T->type=SymT.sym[rtn].type;
@@ -1160,7 +1177,7 @@ void Exp(struct node *T)
                     T->code=NULL;
                 }
                 if(T->ptr[0]==NULL&&SymT.sym[rtn].paramnum>0) {
-                    semanticError(T->pos,T->type_id,"函数调用参数太少");
+                    semanticError(T->pos,T->type_id,"There are too few function call parameters\n");
                 } else {
                     matchParam(rtn,T->ptr[0]);
                 }
@@ -1227,7 +1244,9 @@ void Exp(struct node *T)
                     Exp(T->ptr[0]);
                     T->code=T->ptr[0]->code;
                 }
+                T->code = NULL;
                 break;
+            
         }
     }
 }
@@ -1239,6 +1258,24 @@ void boolExp(struct node *T)
     int rtn;
     if (T) {
         switch(T->kind) {
+            case _NEGA:
+                if(T->ptr[0]->kind==_IDENT_ONLY || T->ptr[0]->kind==_INT_CONST) {
+                    Exp(T->ptr[0]);
+                    T->type=T->ptr[0]->type;
+                    T->width=T->ptr[0]->width+4;
+                    T->ptr[0]->offset=T->offset;
+                    T->place=fillTemp(newTemp(),LEV,T->type,'T',T->offset);
+                    opn1.kind=ID;
+                    result.kind=ID;
+                    strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
+                    strcpy(result.id,SymT.sym[T->place].alias);
+                    T->code=merge(2,T->ptr[0]->code,genIR(T->kind,opn1,opn2,result));
+                } else {
+                    boolExp(T->ptr[0]);
+                    T->code=T->ptr[0]->code;
+                    T->place=T->ptr[0]->place;
+                }
+                break;
             case _RELOP:
                 T->ptr[0]->offset = T->ptr[1]->offset = T->offset;
                 Exp(T->ptr[0]);
@@ -1314,9 +1351,9 @@ void boolExp(struct node *T)
             case _IDENT_ONLY:
                 rtn = searchSymbolTable(T->type_id);
                 if (rtn==-1)
-                    semanticError(T->pos,T->type_id, "变量未定义");
+                    semanticError(T->pos,T->type_id, "The variable is undefined\n");
                 if (SymT.sym[rtn].flag=='F')
-                    semanticError(T->pos,T->type_id, "是函数名，类型不匹配");
+                    semanticError(T->pos,T->type_id, "It's the function name, the type does not match\n");
                 else {
                     opn1.kind=ID; 
                     strcpy(opn1.id,SymT.sym[rtn].alias);
@@ -1390,7 +1427,7 @@ void semanticAnalysis(struct node *T)
                 T->offset = DX;
                 rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'F',0);
                 if(rtn == -1) {
-                    semanticError(T->pos,T->type_id,"函数重复定义");
+                    semanticError(T->pos,T->type_id,"The function is defined repeatedly\n");
                     break;
                 } else
                     T->place = rtn;
@@ -1414,7 +1451,7 @@ void semanticAnalysis(struct node *T)
                 T->offset = DX;
                 rtn = fillSymbolTable(T->type_id,newAlias(),LEV,T->type,'F',0);
                 if(rtn == -1) {
-                    semanticError(T->pos,T->type_id,"函数重复定义");
+                    semanticError(T->pos,T->type_id,"The function is defined repeatedly\n");
                     break;
                 } else
                     T->place = rtn;
@@ -1435,7 +1472,7 @@ void semanticAnalysis(struct node *T)
                     SymT.sym[T->place].offset = T->offset + T->ptr[1]->width;
                     strcpy(result.id,T->ptr[0]->Snext);
                     result.kind=ID;
-                    T->code = merge(3,T->code,T->ptr[0]->code,genIR(RC_SIGN,opn1,opn2,result));
+                    T->code = merge(3,T->code,T->ptr[1]->code,genIR(RC_SIGN,opn1,opn2,result));
                     // T->code = merge(3,T->code,T->ptr[1]->code,genLabel(T->ptr[1]->Snext));
                     // T->code = merge(2,T->code,T->ptr[0]->code);
                 } else {
@@ -1461,7 +1498,7 @@ void semanticAnalysis(struct node *T)
             case _PARAM:
                 rtn = fillSymbolTable(T->type_id,newAlias(),1,T->ptr[0]->type,'P',T->offset);
                 if(rtn == -1) {
-                    semanticError(T->pos,T->type_id,"参数名重复定义");
+                    semanticError(T->pos,T->type_id,"Parameter names are defined repeatedly\n");
                 } else
                 T->place = rtn;
                 T->num = 1;
@@ -1475,7 +1512,7 @@ void semanticAnalysis(struct node *T)
             case _PARAM_VARARR:
                 rtn = fillSymbolTable(T->type_id,newAlias(),1,T->ptr[0]->type,'P',T->offset);
                 if(rtn == -1) {
-                    semanticError(T->pos,T->type_id,"参数名重复定义");
+                    semanticError(T->pos,T->type_id,"Parameter names are defined repeatedly\n");
                 } else
                     T->place = rtn;
                 T->num = 1;
@@ -1502,7 +1539,7 @@ void semanticAnalysis(struct node *T)
             case _PARAM_NULL:
                 rtn = fillSymbolTable(T->type_id,newAlias(),1,T->ptr[0]->type,'P',T->offset);
                 if(rtn == -1) {
-                    semanticError(T->pos,T->type_id,"参数名重复定义");
+                    semanticError(T->pos,T->type_id,"Parameter names are defined repeatedly\n");
                 } else
                     T->place = rtn;
                 T->num = 1;
@@ -1665,9 +1702,9 @@ void semanticAnalysis(struct node *T)
             case _CONTINUE:
             case _POSI:
             case _NEGA:
-            case _NOT:
                 break;
 
+            case _NOT:
             case _EXP_SEMI:
             case _IDENT_ONLY:
             case _IDENT_ARR:
@@ -1692,6 +1729,7 @@ void semanticAnalysis(struct node *T)
 
 void semanticAnalysisMain()
 {
+    int rtn;
     FILE *fp = fopen("./cmake-build-debug/test.txt","w");
     if(fp != NULL)
     {
@@ -1702,6 +1740,19 @@ void semanticAnalysisMain()
     {
         fclose(fp);
     }
+    SymT.index=0;
+    fillSymbolTable("getint",newAlias(),0,INT,'F',4);
+    fillSymbolTable("getch",newAlias(),0,INT,'F',4);
+    fillSymbolTable("getarray",newAlias(),0,INT,'F',4);
+    fillSymbolTable("a",newAlias(),1,INT,'P',4);
+    fillSymbolTable("putint",newAlias(),0,VOID,'F',4);
+    rtn=fillSymbolTable("a",newAlias(),1,INT,'P',4);
+    fillSymbolTable("putch",newAlias(),0,VOID,'F',4);
+    rtn=fillSymbolTable("a",newAlias(),1,INT,'P',4);
+    fillSymbolTable("putarray",newAlias(),0,VOID,'F',4);
+    rtn=fillSymbolTable("n",newAlias(),1,INT,'P',4);
+    rtn=fillSymbolTable("a",newAlias(),1,INT,'P',4);
+    SymT.sym[rtn].isArray=1;
     SymbolScope.TX[0] = 0;
     SymbolScope.top = 1;
     astRoot->offset = 0;
