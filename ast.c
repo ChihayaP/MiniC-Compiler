@@ -191,7 +191,7 @@ void changeFunNameTable()
                 strcpy(cTmp,"@");
                 strcpy(VarT.sym[i].varName, strcat(cTmp,VarT.sym[i].name));
                 for(j=i+1;j<VarT.index;j++) {
-                    if(VarT.sym[j].flag=='F')
+                    if(VarT.sym[j].flag=='F' || VarT.sym[j].flag=='G')
                         break;
                 }
                 changeVarNameTable(i,j,VarT.sym[i].paramnum);
@@ -353,7 +353,7 @@ void prnIR(struct codenode *head){
     char opnstr1[32],opnstr2[32],resultstr[32];
     struct codenode *h=head;
     struct codenode *t;
-    for(i=0;i<VarT.index;i++) {
+    for(i=11;i<VarT.index;i++) {
         if(VarT.sym[i].flag=='G') {
             if(VarT.sym[i].isArray==0)
                 fprintf(fp,"declare i32 %s\n",VarT.sym[i].varName);
@@ -1577,6 +1577,48 @@ void semanticAnalysis(struct node *T)
                 SymbolScope.TX[SymbolScope.top++] = SymT.index;
                 T->width = 0;
                 T->code =  NULL;
+                // if(T->ptr[0]) {
+                //     T->ptr[0]->offset = T->offset;
+                //     semanticAnalysis(T->ptr[0]);
+                //     T->width += T->ptr[0]->width;
+                //     T->code = T->ptr[0]->code;
+                // }
+                // if(T->ptr[1]) {
+                //     T->ptr[1]->offset = T->offset + T->width;
+                //     strcpy(T->ptr[1]->Snext,T->Snext);
+                //     semanticAnalysis(T->ptr[1]);
+                //     T->width += T->ptr[1]->width;
+                //     T->code = merge(2,T->code,T->ptr[1]->code);
+                // }
+                if(T->ptr[0]) {
+                    T->ptr[0]->offset = T->offset + T->width;
+                    strcpy(T->ptr[0]->Snext,T->Snext);
+                    semanticAnalysis(T->ptr[0]);
+                    T->width += T->ptr[0]->width;
+                    T->code = merge(2,T->code,T->ptr[0]->code);
+                }
+                prnSymbol();
+                symTToVarNameT();
+                LEV--;
+                SymT.index = SymbolScope.TX[--SymbolScope.top];
+                break;
+            case _BLOCKITEMLIST:
+                strcpy(T->ptr[0]->Snext,T->Snext);
+                semanticAnalysis(T->ptr[0]);
+                T->code = T->ptr[0]->code;
+                T->width = T->ptr[0]->width;
+                if(T->ptr[1]) {
+                    strcpy(T->ptr[1]->Snext, T->Snext);
+                    T->ptr[1]->offset = T->offset;
+                    semanticAnalysis(T->ptr[1]);
+                    T->code=merge(2,T->code,T->ptr[1]->code);
+                    if(T->ptr[1]->width > T->width)
+                        T->width = T->ptr[1]->width;
+                }
+                break;
+            case _BLOCKITEM_:
+                T->width = 0;
+                T->code =  NULL;
                 if(T->ptr[0]) {
                     T->ptr[0]->offset = T->offset;
                     semanticAnalysis(T->ptr[0]);
@@ -1590,10 +1632,6 @@ void semanticAnalysis(struct node *T)
                     T->width += T->ptr[1]->width;
                     T->code = merge(2,T->code,T->ptr[1]->code);
                 }
-                prnSymbol();
-                symTToVarNameT();
-                LEV--;
-                SymT.index = SymbolScope.TX[--SymbolScope.top];
                 break;
             case _DECLLIST:
                 T->code = NULL;
@@ -1741,15 +1779,22 @@ void semanticAnalysisMain()
         fclose(fp);
     }
     SymT.index=0;
-    fillSymbolTable("getint",newAlias(),0,INT,'F',4);
-    fillSymbolTable("getch",newAlias(),0,INT,'F',4);
-    fillSymbolTable("getarray",newAlias(),0,INT,'F',4);
-    fillSymbolTable("a",newAlias(),1,INT,'P',4);
-    fillSymbolTable("putint",newAlias(),0,VOID,'F',4);
+    rtn=fillSymbolTable("getint",newAlias(),0,INT,'F',4);
+    SymT.sym[rtn].paramnum=0;
+    rtn=fillSymbolTable("getch",newAlias(),0,INT,'F',4);
+    SymT.sym[rtn].paramnum=0;
+    rtn=fillSymbolTable("getarray",newAlias(),0,INT,'F',4);
+    SymT.sym[rtn].paramnum=1;
     rtn=fillSymbolTable("a",newAlias(),1,INT,'P',4);
-    fillSymbolTable("putch",newAlias(),0,VOID,'F',4);
+    SymT.sym[rtn].isArray=1;
+    rtn=fillSymbolTable("putint",newAlias(),0,VOID,'F',4);
+    SymT.sym[rtn].paramnum=1;
     rtn=fillSymbolTable("a",newAlias(),1,INT,'P',4);
-    fillSymbolTable("putarray",newAlias(),0,VOID,'F',4);
+    rtn=fillSymbolTable("putch",newAlias(),0,VOID,'F',4);
+    SymT.sym[rtn].paramnum=1;
+    rtn=fillSymbolTable("a",newAlias(),1,INT,'P',4);
+    rtn=fillSymbolTable("putarray",newAlias(),0,VOID,'F',4);
+    SymT.sym[rtn].paramnum=2;
     rtn=fillSymbolTable("n",newAlias(),1,INT,'P',4);
     rtn=fillSymbolTable("a",newAlias(),1,INT,'P',4);
     SymT.sym[rtn].isArray=1;

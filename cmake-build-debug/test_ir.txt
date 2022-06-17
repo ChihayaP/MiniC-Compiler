@@ -1,0 +1,64 @@
+declare i32 @a
+declare i32 @b
+declare i32 @c
+declare i32 @d
+declare i32 @e
+define i32 @main() {
+    declare i32 %l0
+    declare i32 %t1
+    declare i32 %t2
+    declare i32 %t3
+    declare i32 %t4
+    declare i32 %t5
+    declare i32 %t6
+    declare i32 %t7
+    declare i32 %t8
+    declare i32 %t9
+    declare i32 %t10
+    declare i1 %t11
+    declare i32 %t12
+    declare i32 %t13
+    declare i32 %t14
+    declare i1 %t15
+    declare i32 %t16
+    declare i32 %t17
+    declare i32 %t18
+    declare i1 %t19
+    declare i32 %t20
+    entry
+    %t1 = call i32 @getint()
+    @a = %t1
+    %t2 = call i32 @getint()
+    @b = %t2
+    %t3 = call i32 @getint()
+    @c = %t3
+    %t4 = call i32 @getint()
+    @d = %t4
+    %t5 = call i32 @getint()
+    @e = %t5
+    %t6 = 0
+    %l0 = %t6
+    %t7 = mul @b, @c
+    %t8 = sub @a, %t7
+    %t9 = div @a, @c
+    %t10 = sub @d, %t9
+    %t11 = cmp ne %t8, %t10
+    bc %t11, label .L7, label .L9
+.L9 :
+    %t12 = mul @a, @b
+    %t13 = div %t12, @c
+    %t14 = add @e, @d
+    %t15 = cmp eq %t13, %t14
+    bc %t15, label .L7, label .L8
+.L8 :
+    %t16 = add @a, @b
+    %t17 = add %t16, @c
+    %t18 = add @d, @e
+    %t19 = cmp eq %t17, %t18
+    bc %t19, label .L7, label .L6
+.L7 :
+    %t20 = 1
+    %l0 = %t20
+.L6 :
+    exit %l0
+}

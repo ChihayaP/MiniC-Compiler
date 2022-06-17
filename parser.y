@@ -30,7 +30,7 @@ int yylex();
 %token <type_int> INT_CONST
 
 // 非终结符的类型定义
-%type <ptr> CompUnit FuncDef Block Stmt Number Exp UnaryExp PrimaryExp AddExp MulExp LOrExp LAndExp EqExp Decl LVal VarDecl BType Cond VarArray Array FuncFParams FuncFParam DeclList StmtList Args
+%type <ptr> CompUnit FuncDef Block Stmt Number Exp UnaryExp PrimaryExp AddExp MulExp LOrExp LAndExp EqExp Decl LVal VarDecl BType Cond VarArray Array FuncFParams FuncFParam DeclList StmtList Args BlockItemList BlockItem
 
 %left '-' '+'
 %left '*' '/' '%'
@@ -92,8 +92,17 @@ VarArray
   ;
 
 Block
-  : '{' DeclList StmtList '}' {$$=mknode(_BLOCKITEM,$2,$3,NULL,yylineno);}
+  : '{' BlockItemList '}' {$$=mknode(_BLOCKITEM,$2,NULL,NULL,yylineno);}
   | '{' '}'                   {$$=mknode(_BLOCKITEMNULL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"\\{\\}");}
+  ;
+
+BlockItemList
+  : {$$=NULL;}
+  | BlockItem BlockItemList {$$=mknode(_BLOCKITEMLIST,$1,$2,NULL,yylineno);}
+  ;
+
+BlockItem
+  : DeclList StmtList {$$=mknode(_BLOCKITEM_,$1,$2,NULL,yylineno);}
   ;
 
 DeclList
@@ -180,7 +189,7 @@ UnaryExp
 PrimaryExp
   : '(' Exp ')' {$$=$2;}
   | Number      {$$=$1;}
-  | LVal        {$$=$1;}
+  | LVal        {$$=$1;} 
   | IDENT '(' ')'       {$$=mknode(_FUNC_CALL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,$1);}
   | IDENT '(' Args ')'  {$$=mknode(_FUNC_CALL,$3,NULL,NULL,yylineno);strcpy($$->type_id,$1);}  
   ;
