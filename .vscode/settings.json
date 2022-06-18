@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "gvc.h": "c"
+        "gvc.h": "c",
+        "functional": "c"
     }
 
 }

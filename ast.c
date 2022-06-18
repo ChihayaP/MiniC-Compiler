@@ -13,7 +13,9 @@ char agnodeChar[100] = "";
 struct node *astRoot;           //ast根节点
 int LEV = 0;
 int func_size;
-
+char SYMBOL_FILE[50]="";
+char IR_FILE[50]="";
+char PNG_FILE[50]="";
 
 
 struct symboltable
@@ -254,8 +256,13 @@ Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
         case _EXP:
         case _NUMBER:
         case _LVAL:
+        case _BLOCKITEMLIST:
+        case _BLOCKITEM_:
+
             child_node = parent_node;
             break;
+        case _VARARR_ONLY:
+        case _VARARR_WITH:
         case _INT_CONST:
             memset(agnodeChar,0,sizeof(agnodeChar));
             child_node = agnode(g, itoa(agnodeNum,agnodeChar,10), 1);
@@ -272,6 +279,16 @@ Agnode_t *draw_tree_node(struct node *T, Agraph_t *g, Agnode_t *parent_node)
                 Agedge_t *e = agedge(g, (Agnode_t *)parent_node, (Agnode_t *)child_node, NULL, 1);
             }
             break;
+        case _RELOP:
+            if(strcmp(T->type_id,"<")==0) {
+                strcpy(T->type_id,"\\<");
+            } else if(strcmp(T->type_id,">")==0) {
+                strcpy(T->type_id,"\\>");
+            } else if(strcmp(T->type_id,"<=")==0) {
+                strcpy(T->type_id,"\\<=");
+            } else if(strcmp(T->type_id,">=")==0) {
+                strcpy(T->type_id,"\\>=");
+            } 
         default:
             memset(agnodeChar,0,sizeof(agnodeChar));
             child_node = agnode(g, itoa(agnodeNum,agnodeChar,10), 1);
@@ -319,7 +336,7 @@ void drawAst()
         return;
     }
     gvLayout(gv, g, "dot");
-    gvRenderFilename(gv, g, "png", "main.png");
+    gvRenderFilename(gv, g, "png", PNG_FILE);
     agclose(g);
     gvFreeContext(gv);
 }
@@ -349,7 +366,7 @@ int returnVarTablePos(char *alias)
 void prnIR(struct codenode *head){
     int i,j,k;
     char tmpstr1[32]="", tmpstr2[32]="";
-    FILE *fp = fopen("./cmake-build-debug/test_ir.txt","a");
+    FILE *fp = fopen(IR_FILE,"a");
     char opnstr1[32],opnstr2[32],resultstr[32];
     struct codenode *h=head;
     struct codenode *t;
@@ -722,7 +739,7 @@ void prnSymbol()
 
 void prnVarSymbol()
 {
-    FILE *fp = fopen("./cmake-build-debug/test.txt","a");
+    FILE *fp = fopen(SYMBOL_FILE,"a");
     int i=0;
     // printf( "%8s %6s %6s  %6s %4s %8s\n","name","alias","LEV","type","flag","varName");
     fprintf(fp, "%8s %6s %6s  %6s %4s %8s\n","name","alias","LEV","type","flag","varName");
@@ -1243,8 +1260,9 @@ void Exp(struct node *T)
                 if(T->ptr[0]->kind==_FUNC_CALL) {
                     Exp(T->ptr[0]);
                     T->code=T->ptr[0]->code;
+                } else {
+                    T->code = NULL;
                 }
-                T->code = NULL;
                 break;
             
         }
@@ -1726,10 +1744,22 @@ void semanticAnalysis(struct node *T)
                     }
                     while(SymT.sym[num].flag != 'F');
                     T->width = T->ptr[0]->width;
-                    result.kind = ID;
-                    strcpy(result.id, SymT.sym[T->ptr[0]->place].alias);
-                    result.offset = SymT.sym[T->ptr[0]->place].offset;
-                    T->code = merge(2, T->ptr[0]->code, genIR(RETURN,opn1,opn2,result));
+                    if(SymT.sym[T->ptr[0]->place].isArray==1) {
+                        result.kind=ID;
+                        rtn=fillTemp(newTemp(),LEV,INT,'T',T->offset);
+                        strcpy(result.id,SymT.sym[rtn].alias);
+                        opn1.kind=ID;
+                        strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
+                        T->code=merge(2,T->ptr[0]->code,genIR(ASSIGNOP,opn1,opn2,result));
+                        result.kind = ID;
+                        strcpy(result.id, SymT.sym[rtn].alias);
+                        T->code = merge(2, T->ptr[0]->code, genIR(RETURN,opn1,opn2,result));
+                    } else {
+                        result.kind = ID;
+                        strcpy(result.id, SymT.sym[T->ptr[0]->place].alias);
+                        result.offset = SymT.sym[T->ptr[0]->place].offset;
+                        T->code = merge(2, T->ptr[0]->code, genIR(RETURN,opn1,opn2,result));
+                    }
                 } else {
                     T->width = 0;
                     result.kind =- 0;
@@ -1768,12 +1798,12 @@ void semanticAnalysis(struct node *T)
 void semanticAnalysisMain()
 {
     int rtn;
-    FILE *fp = fopen("./cmake-build-debug/test.txt","w");
+    FILE *fp = fopen(SYMBOL_FILE,"w");
     if(fp != NULL)
     {
         fclose(fp);
     }
-    fp = fopen("./cmake-build-debug/test_ir.txt","w");
+    fp = fopen(IR_FILE,"w");
     if(fp != NULL)
     {
         fclose(fp);
@@ -1804,6 +1834,11 @@ void semanticAnalysisMain()
     semanticAnalysis(astRoot);
     // prnVarSymbol();
     changeFunNameTable();
+    // prnVarSymbol();
+}
+
+void prnVarSymbolMain()
+{
     prnVarSymbol();
 }
 

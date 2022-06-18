@@ -1305,7 +1305,7 @@ yyreduce:
 
   case 17: /* Decl: INT VarDecl ';'  */
 #line 79 "../parser.y"
-                    {(yyval.ptr)=mknode(_VARDECL,(yyvsp[-1].ptr),NULL,NULL,yylineno);(yyval.ptr)->type=INT;strcpy((yyval.ptr)->type_id,"varDecl");}
+                    {(yyval.ptr)=mknode(_VARDECL,(yyvsp[-1].ptr),NULL,NULL,yylineno);(yyval.ptr)->type=INT;strcpy((yyval.ptr)->type_id,"int");}
 #line 1310 "parser.tab.c"
     break;
 
@@ -1353,7 +1353,7 @@ yyreduce:
 
   case 25: /* Block: '{' '}'  */
 #line 96 "../parser.y"
-                              {(yyval.ptr)=mknode(_BLOCKITEMNULL,NULL,NULL,NULL,yylineno);strcpy((yyval.ptr)->type_id,"\\{\\}");}
+                          {(yyval.ptr)=mknode(_BLOCKITEMNULL,NULL,NULL,NULL,yylineno);strcpy((yyval.ptr)->type_id,"\\{\\}");}
 #line 1358 "parser.tab.c"
     break;
 
@@ -1383,7 +1383,7 @@ yyreduce:
 
   case 30: /* DeclList: Decl DeclList  */
 #line 110 "../parser.y"
-                  {(yyval.ptr)=mknode(_DECLLIST,(yyvsp[-1].ptr),(yyvsp[0].ptr),NULL,yylineno);}
+                  {(yyval.ptr)=mknode(_DECLLIST,(yyvsp[-1].ptr),(yyvsp[0].ptr),NULL,yylineno);strcpy((yyval.ptr)->type_id,"DeclList");}
 #line 1388 "parser.tab.c"
     break;
 
@@ -1395,7 +1395,7 @@ yyreduce:
 
   case 32: /* StmtList: Stmt StmtList  */
 #line 115 "../parser.y"
-                  {(yyval.ptr)=mknode(_STMTLIST,(yyvsp[-1].ptr),(yyvsp[0].ptr),NULL,yylineno);}
+                  {(yyval.ptr)=mknode(_STMTLIST,(yyvsp[-1].ptr),(yyvsp[0].ptr),NULL,yylineno);strcpy((yyval.ptr)->type_id,"StmtList");}
 #line 1400 "parser.tab.c"
     break;
 
@@ -1491,7 +1491,7 @@ yyreduce:
 
   case 48: /* LOrExp: LOrExp OR LAndExp  */
 #line 146 "../parser.y"
-                      {(yyval.ptr)=mknode(_OR,(yyvsp[-2].ptr),(yyvsp[0].ptr),NULL,yylineno);strcpy((yyval.ptr)->type_id,"||");}
+                      {(yyval.ptr)=mknode(_OR,(yyvsp[-2].ptr),(yyvsp[0].ptr),NULL,yylineno);strcpy((yyval.ptr)->type_id,"\\|\\|");}
 #line 1496 "parser.tab.c"
     break;
 
@@ -1641,13 +1641,13 @@ yyreduce:
 
   case 73: /* Args: Exp ',' Args  */
 #line 198 "../parser.y"
-                  {(yyval.ptr)=mknode(_ARGS,(yyvsp[-2].ptr),(yyvsp[0].ptr),NULL,yylineno);}
+                  {(yyval.ptr)=mknode(_ARGS,(yyvsp[-2].ptr),(yyvsp[0].ptr),NULL,yylineno);strcpy((yyval.ptr)->type_id,"args");}
 #line 1646 "parser.tab.c"
     break;
 
   case 74: /* Args: Exp  */
 #line 199 "../parser.y"
-                  {(yyval.ptr)=mknode(_ARGS,(yyvsp[0].ptr),NULL,NULL,yylineno);}
+                  {(yyval.ptr)=mknode(_ARGS,(yyvsp[0].ptr),NULL,NULL,yylineno);strcpy((yyval.ptr)->type_id,"args");}
 #line 1652 "parser.tab.c"
     break;
 

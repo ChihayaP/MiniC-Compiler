@@ -1,31 +1,20 @@
-define i32 @ifElse() {
+define i32 @main() {
     declare i32 %l0
-    declare i32 %t1
+    declare i32 %l1
     declare i32 %t2
-    declare i1 %t3
-    declare i32 %t4
+    declare i32 %t3
+    declare i1 %t4
     declare i32 %t5
     declare i32 %t6
     entry
-    %t1 = 5
-    %l0 = %t1
-    %t2 = 5
-    %t3 = cmp eq %l0, %t2
-    bc %t3, label .L3, label .L4
-.L3 :
-    %t4 = 25
-    %l0 = %t4
-    br .L2
-.L4 :
-    %t5 = 2
-    %t6 = mul %l0, %t5
-    %l0 = %t6
+    %t2 = 1
+    %t3 = neg %t2
+    %t4 = cmp eq %l0, %t3
+    bc %t4, label .L2, label .L1
 .L2 :
-    exit %l0
-}
-define i32 @main() {
-    declare i32 %t0
-    entry
-    %t0 = call i32 @ifElse()
-    exit %t0
+    %t5 = 1
+    exit %t5
+.L1 :
+    %t6 = 0
+    exit %t6
 }

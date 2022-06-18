@@ -76,7 +76,7 @@ FuncFParam
   ; */
 
 Decl
-  : INT VarDecl ';' {$$=mknode(_VARDECL,$2,NULL,NULL,yylineno);$$->type=INT;strcpy($$->type_id,"varDecl");}
+  : INT VarDecl ';' {$$=mknode(_VARDECL,$2,NULL,NULL,yylineno);$$->type=INT;strcpy($$->type_id,"int");}
   ;
 
 VarDecl
@@ -93,7 +93,7 @@ VarArray
 
 Block
   : '{' BlockItemList '}' {$$=mknode(_BLOCKITEM,$2,NULL,NULL,yylineno);}
-  | '{' '}'                   {$$=mknode(_BLOCKITEMNULL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"\\{\\}");}
+  | '{' '}'               {$$=mknode(_BLOCKITEMNULL,NULL,NULL,NULL,yylineno);strcpy($$->type_id,"\\{\\}");}
   ;
 
 BlockItemList
@@ -107,12 +107,12 @@ BlockItem
 
 DeclList
   : {$$=NULL;}
-  | Decl DeclList {$$=mknode(_DECLLIST,$1,$2,NULL,yylineno);}
+  | Decl DeclList {$$=mknode(_DECLLIST,$1,$2,NULL,yylineno);strcpy($$->type_id,"DeclList");}
   ;
 
 StmtList
   : {$$=NULL;}
-  | Stmt StmtList {$$=mknode(_STMTLIST,$1,$2,NULL,yylineno);}
+  | Stmt StmtList {$$=mknode(_STMTLIST,$1,$2,NULL,yylineno);strcpy($$->type_id,"StmtList");}
   ;
 
 BType
@@ -143,7 +143,7 @@ Exp
 
 LOrExp
   : LAndExp           {$$=$1;}
-  | LOrExp OR LAndExp {$$=mknode(_OR,$1,$3,NULL,yylineno);strcpy($$->type_id,"||");}
+  | LOrExp OR LAndExp {$$=mknode(_OR,$1,$3,NULL,yylineno);strcpy($$->type_id,"\\|\\|");}
   ;
 
 LAndExp
@@ -195,8 +195,8 @@ PrimaryExp
   ;
 
 Args
-  : Exp ',' Args  {$$=mknode(_ARGS,$1,$3,NULL,yylineno);}
-  | Exp           {$$=mknode(_ARGS,$1,NULL,NULL,yylineno);}
+  : Exp ',' Args  {$$=mknode(_ARGS,$1,$3,NULL,yylineno);strcpy($$->type_id,"args");}
+  | Exp           {$$=mknode(_ARGS,$1,NULL,NULL,yylineno);strcpy($$->type_id,"args");}
   ;
 
 Number

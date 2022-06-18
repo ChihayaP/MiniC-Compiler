@@ -8,8 +8,15 @@
             "name": "GDB cmake",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/cmake-build-debug/main.exe",
+            "program": "${workspaceFolder}/cmake-build-debug/minic.exe",
             "args": [
+                "-s",
+                "-i",
+                "-a",
+                "-o",
+                "./cmake-build-debug/test.txt",
+                "./cmake-build-debug/test_ir.txt",
+                "./cmake-build-debug/test.png",
                 "./cmake-build-debug/test.c"
             ],
             "stopAtEntry": true,

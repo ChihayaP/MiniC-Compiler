@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_BUILD_TOOL "Debug")
 
-set(PROJECT_NAME main)
+set(PROJECT_NAME minic)
 
 add_executable(${PROJECT_NAME}
     parser.tab.c

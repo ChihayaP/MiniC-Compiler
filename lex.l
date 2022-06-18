@@ -11,7 +11,6 @@
 #include "parser.tab.h"
 #include "ast.h"
 
-
 typedef union 
 {
 	int type_int;
@@ -26,7 +25,7 @@ typedef union
 /* 空白符和注释 */
 WhiteSpace    [ \t\n\r]*
 LineComment   "//".*
-
+MultiLineComment "/*"((\*+[^/*])|([^*]))*\**"*/"
 /* 标识符 */
 Identifier    [a-zA-Z_][a-zA-Z0-9_]*
 
@@ -39,7 +38,7 @@ Hexadecimal   0[xX][0-9a-fA-F]+
 
 {WhiteSpace}    { /* 忽略, 不做任何操作 */ }
 {LineComment}   { /* 忽略, 不做任何操作 */ }
-
+{MultiLineComment} {}
 
 {Decimal}       {yylval.type_int = atoi(yytext); return INT_CONST; }
 {Octal}         {yylval.type_int = atoi(yytext); return INT_CONST; }

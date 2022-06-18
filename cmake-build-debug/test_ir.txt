@@ -1,21 +1,44 @@
 declare i32 @a
-declare i32 @b
-declare i32 @c
-declare i32 @d
-declare i32 @e
-define i32 @main() {
+define i32 @func() {
     declare i32 %l0
-    declare i32 %t1
+    declare i32 %l1
     declare i32 %t2
-    declare i32 %t3
+    declare i1 %t3
     declare i32 %t4
     declare i32 %t5
     declare i32 %t6
     declare i32 %t7
+    entry
+    %l0 = @a
+    %t2 = 1
+    %l1 = %t2
+    %t3 = cmp eq %l1, %l0
+    bc %t3, label .L2, label .L3
+.L2 :
+    %t4 = 1
+    %t5 = add %l1, %t4
+    %l1 = %t5
+    %t6 = 1
+    exit %t6
+    br }
+
+.L3 :
+    %t7 = 0
+    exit %t7
+}
+define i32 @main() {
+    declare i32 %l0
+    declare i32 %l1
+    declare i32 %t2
+    declare i32 %t3
+    declare i32 %t4
+    declare i32 %t5
+    declare i1 %t6
+    declare i32 %t7
     declare i32 %t8
-    declare i32 %t9
+    declare i1 %t9
     declare i32 %t10
-    declare i1 %t11
+    declare i32 %t11
     declare i32 %t12
     declare i32 %t13
     declare i32 %t14
@@ -23,42 +46,43 @@ define i32 @main() {
     declare i32 %t16
     declare i32 %t17
     declare i32 %t18
-    declare i1 %t19
-    declare i32 %t20
     entry
-    %t1 = call i32 @getint()
-    @a = %t1
-    %t2 = call i32 @getint()
-    @b = %t2
-    %t3 = call i32 @getint()
-    @c = %t3
-    %t4 = call i32 @getint()
-    @d = %t4
-    %t5 = call i32 @getint()
-    @e = %t5
-    %t6 = 0
-    %l0 = %t6
-    %t7 = mul @b, @c
-    %t8 = sub @a, %t7
-    %t9 = div @a, @c
-    %t10 = sub @d, %t9
-    %t11 = cmp ne %t8, %t10
-    bc %t11, label .L7, label .L9
-.L9 :
-    %t12 = mul @a, @b
-    %t13 = div %t12, @c
-    %t14 = add @e, @d
-    %t15 = cmp eq %t13, %t14
-    bc %t15, label .L7, label .L8
+    %t2 = 7
+    @a = %t2
+    %t3 = 0
+    %l0 = %t3
+    %t4 = 0
+    %l1 = %t4
 .L8 :
-    %t16 = add @a, @b
-    %t17 = add %t16, @c
-    %t18 = add @d, @e
-    %t19 = cmp eq %t17, %t18
-    bc %t19, label .L7, label .L6
+    %t5 = 100
+    %t6 = cmp lt %l1, %t5
+    bc %t6, label .L7, label .L6
 .L7 :
-    %t20 = 1
-    %l0 = %t20
+    %t7 = call i32 @func()
+    %t8 = 1
+    %t9 = cmp eq %t7, %t8
+    bc %t9, label .L10, label .L9
+.L10 :
+    %t10 = 1
+    %t11 = add %l0, %t10
+    %l0 = %t11
+.L9 :
+    %t12 = 1
+    %t13 = add %l1, %t12
+    %l1 = %t13
+    br .L8
 .L6 :
-    exit %l0
+    %t14 = 100
+    %t15 = cmp lt %l0, %t14
+    bc %t15, label .L12, label .L13
+.L12 :
+    %t16 = 1
+    call void @putint(i32 %t16)
+    br .L11
+.L13 :
+    %t17 = 0
+    call void @putint(i32 %t17)
+.L11 :
+    %t18 = 0
+    exit %t18
 }

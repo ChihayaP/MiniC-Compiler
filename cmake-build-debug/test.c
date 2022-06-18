@@ -1,20 +1,32 @@
 int a;
-int b;
-int c;
-int d;
-int e;
-int main()
-{
-	a=getint();
-	b=getint();
-	c=getint();
-	d=getint();
-	e=getint();
-	int flag;
-	flag = 0;
-	if(a-b*c!=d-a/c||a*b/c==e+d||a+b+c==d+e)
-	{
-		flag=1;
+
+int func() {
+	int b;
+	b = a;
+	int a;
+	a = 1;
+	if (a == b) {
+		a = a + 1;
+		return 1;
 	}
-	return flag;
+	else
+		return 0;
+}
+
+int main() {
+	a = 7;
+	int result;
+	result = 0;
+	int i;
+	i = 0;
+	while (i < 100) {
+		if (func() == 1)
+			result = result + 1;
+		i = i + 1;
+	}
+	if (result < 100)
+		putint(1);
+	else
+		putint(0);
+	return 0;
 }

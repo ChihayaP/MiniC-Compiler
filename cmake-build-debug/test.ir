@@ -1,20 +1,89 @@
+declare i32 @a
+define i32 @func() {
+    declare i32 %l0
+    declare i32 %l1
+    declare i32 %t2
+    declare i1 %t3
+    declare i32 %t4
+    declare i32 %t5
+    declare i32 %t6
+    declare i32 %t7
+    entry
+    %l0 = @a
+    %t2 = 1
+    %l1 = %t2
+    %t3 = cmp eq %l1, %l0
+    bc %t3, label .L3, label .L4
+.L3 :
+    %t4 = 1
+    %t5 = add %l1, %t4
+    %l1 = %t5
+    %t6 = 1
+    exit %t6
+    br .L1
+.L4 :
+    %t7 = 0
+    exit %t7
+.L1 :
+}
 define i32 @main() {
     declare i32 %l0
     declare i32 %l1
     declare i32 %t2
     declare i32 %t3
-    declare i1 %t4
+    declare i32 %t4
     declare i32 %t5
-    declare i32 %t6
+    declare i1 %t6
+    declare i32 %t7
+    declare i32 %t8
+    declare i1 %t9
+    declare i32 %t10
+    declare i32 %t11
+    declare i32 %t12
+    declare i32 %t13
+    declare i32 %t14
+    declare i1 %t15
+    declare i32 %t16
+    declare i32 %t17
+    declare i32 %t18
     entry
-    %t2 = 1
-    %t3 = neg %t2
-    %t4 = cmp eq %l0, %t3
-    bc %t4, label .L2, label .L1
-.L2 :
-    %t5 = 1
-    exit %t5
-.L1 :
-    %t6 = 0
-    exit %t6
+    %t2 = 7
+    @a = %t2
+    %t3 = 0
+    %l0 = %t3
+    %t4 = 0
+    %l1 = %t4
+.L10 :
+    %t5 = 100
+    %t6 = cmp lt %l1, %t5
+    bc %t6, label .L9, label .L8
+.L9 :
+    %t7 = call i32 @func()
+    %t8 = 1
+    %t9 = cmp eq %t7, %t8
+    bc %t9, label .L12, label .L11
+.L12 :
+    %t10 = 1
+    %t11 = add %l0, %t10
+    %l0 = %t11
+.L11 :
+    %t12 = 1
+    %t13 = add %l1, %t12
+    %l1 = %t13
+    br .L10
+.L8 :
+    %t14 = 100
+    %t15 = cmp lt %l0, %t14
+    bc %t15, label .L14, label .L15
+.L14 :
+    %t16 = 1
+    call void @putint(i32 %t16)
+    br .L13
+.L15 :
+    %t17 = 0
+    call void @putint(i32 %t17)
+.L13 :
+    %t18 = 0
+    exit %t18
+.L6 :
 }
