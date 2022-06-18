@@ -1,32 +1,99 @@
     name  alias    LEV    type flag  varName
-       a    v12      0     int    G       @a
-    func    v13      0     int    F    @func
-       b    v14      1     int    V      %l0
-       a    v15      1     int    V      %l1
-          temp1      1     int    T      %t2
-          temp2      1    bool    T      %t3
-          temp3      2     int    T      %t4
-          temp4      2     int    T      %t5
-          temp5      2     int    T      %t6
-          temp6      1     int    T      %t7
-    main    v16      0     int    F    @main
-  result    v17      1     int    V      %l0
-       i    v18      1     int    V      %l1
-          temp7      1     int    T      %t2
-          temp8      1     int    T      %t3
-          temp9      1     int    T      %t4
-         temp10      1     int    T      %t5
-         temp11      1    bool    T      %t6
-         temp12      2     int    T      %t7
-         temp13      2     int    T      %t8
-         temp14      2    bool    T      %t9
-         temp15      2     int    T     %t10
-         temp16      2     int    T     %t11
-         temp17      2     int    T     %t12
-         temp18      2     int    T     %t13
-         temp19      1     int    T     %t14
-         temp20      1    bool    T     %t15
-         temp21      1     int    T     %t16
-         temp22      1     int    T     %t17
-         temp23      1     int    T     %t18
+       n    v12      0     int    G       @n
+bubblesort    v13      0     int    F @bubblesort
+     arr    v14      1     int    P      %l1
+       i    v15      1     int    V      %l2
+       j    v16      1     int    V      %l3
+     tmp    v17      4     int    V      %l4
+          temp1      1     int    T      %t5
+          temp2      1     int    T      %t6
+          temp3      1     int    T      %t7
+          temp4      1    bool    T      %t8
+          temp5      2     int    T      %t9
+          temp6      2     int    T     %t10
+          temp7      2     int    T     %t11
+          temp8      2     int    T     %t12
+          temp9      2    bool    T     %t13
+         temp10      3     int    T     %t14
+         temp11      3     int    T     %t15
+         temp12      3     int    T     %t16
+         temp13      3     int    T     %t17
+         temp14      3     int    T     %t18
+         temp15      3     int    T     %t19
+         temp16      3     int    T     %t20
+         temp17      3     int    T     %t21
+         temp18      3    bool    T     %t22
+         temp19      4     int    T     %t23
+         temp20      4     int    T     %t24
+         temp21      4     int    T     %t25
+         temp22      4     int    T     %t26
+         temp23      4     int    T     %t27
+         temp24      4     int    T     %t28
+         temp25      4     int    T     %t29
+         temp26      4     int    T     %t30
+         temp27      4     int    T     %t31
+         temp28      4     int    T     %t32
+         temp29      4     int    T     %t33
+         temp30      4     int    T     %t34
+         temp31      3     int    T     %t35
+         temp32      3     int    T     %t36
+         temp33      2     int    T     %t37
+         temp34      2     int    T     %t38
+         temp35      1     int    T     %t39
+    main    v18      0     int    F    @main
+       a    v19      1     int    V      %l0
+       i    v20      1     int    V      %l1
+     tmp    v21      2     int    V      %l2
+         temp36      1     int    T      %t3
+         temp37      1     int    T      %t4
+         temp38      1     int    T      %t5
+         temp39      1     int    T      %t6
+         temp40      1     int    T      %t7
+         temp41      1     int    T      %t8
+         temp42      1     int    T      %t9
+         temp43      1     int    T     %t10
+         temp44      1     int    T     %t11
+         temp45      1     int    T     %t12
+         temp46      1     int    T     %t13
+         temp47      1     int    T     %t14
+         temp48      1     int    T     %t15
+         temp49      1     int    T     %t16
+         temp50      1     int    T     %t17
+         temp51      1     int    T     %t18
+         temp52      1     int    T     %t19
+         temp53      1     int    T     %t20
+         temp54      1     int    T     %t21
+         temp55      1     int    T     %t22
+         temp56      1     int    T     %t23
+         temp57      1     int    T     %t24
+         temp58      1     int    T     %t25
+         temp59      1     int    T     %t26
+         temp60      1     int    T     %t27
+         temp61      1     int    T     %t28
+         temp62      1     int    T     %t29
+         temp63      1     int    T     %t30
+         temp64      1     int    T     %t31
+         temp65      1     int    T     %t32
+         temp66      1     int    T     %t33
+         temp67      1     int    T     %t34
+         temp68      1     int    T     %t35
+         temp69      1     int    T     %t36
+         temp70      1     int    T     %t37
+         temp71      1     int    T     %t38
+         temp72      1     int    T     %t39
+         temp73      1     int    T     %t40
+         temp74      1     int    T     %t41
+         temp75      1     int    T     %t42
+         temp76      1     int    T     %t43
+         temp77      1     int    T     %t44
+         temp78      1     int    T     %t45
+         temp79      1    bool    T     %t46
+         temp80      2     int    T     %t47
+         temp81      2     int    T     %t48
+         temp82      2     int    T     %t49
+         temp83      2     int    T     %t50
+         temp84      2     int    T     %t51
+         temp85      2     int    T     %t52
+         temp86      2     int    T     %t53
+         temp87      1     int    T     %t54
 

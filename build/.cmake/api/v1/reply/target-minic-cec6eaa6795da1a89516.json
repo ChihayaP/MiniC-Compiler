@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "main.exe"
+			"path" : "minic.exe"
 		},
 		{
-			"path" : "main.pdb"
+			"path" : "minic.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -72,7 +72,7 @@
 			]
 		}
 	],
-	"id" : "main::@6890427a1f51a3e7e1df",
+	"id" : "minic::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -103,8 +103,8 @@
 		],
 		"language" : "C"
 	},
-	"name" : "main",
-	"nameOnDisk" : "main.exe",
+	"name" : "minic",
+	"nameOnDisk" : "minic.exe",
 	"paths" : 
 	{
 		"build" : ".",

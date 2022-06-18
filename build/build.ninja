@@ -36,54 +36,54 @@ include CMakeFiles/rules.ninja
 
 cmake_ninja_workdir = D$:/Git/MiniC-Compiler/build/
 # =============================================================================
-# Object build statements for EXECUTABLE target main
+# Object build statements for EXECUTABLE target minic
 
 
 #############################################
-# Order-only phony target for main
+# Order-only phony target for minic
 
-build cmake_object_order_depends_target_main: phony || lex.yy.c parser.tab.c parser.tab.h
+build cmake_object_order_depends_target_minic: phony || lex.yy.c parser.tab.c parser.tab.h
 
-build CMakeFiles/main.dir/parser.tab.c.obj: C_COMPILER__main_ D$:/Git/MiniC-Compiler/build/parser.tab.c || cmake_object_order_depends_target_main
-  DEP_FILE = CMakeFiles\main.dir\parser.tab.c.obj.d
+build CMakeFiles/minic.dir/parser.tab.c.obj: C_COMPILER__minic_ D$:/Git/MiniC-Compiler/build/parser.tab.c || cmake_object_order_depends_target_minic
+  DEP_FILE = CMakeFiles\minic.dir\parser.tab.c.obj.d
   INCLUDES = -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
-  OBJECT_DIR = CMakeFiles\main.dir
-  OBJECT_FILE_DIR = CMakeFiles\main.dir
+  OBJECT_DIR = CMakeFiles\minic.dir
+  OBJECT_FILE_DIR = CMakeFiles\minic.dir
 
-build CMakeFiles/main.dir/lex.yy.c.obj: C_COMPILER__main_ D$:/Git/MiniC-Compiler/build/lex.yy.c || cmake_object_order_depends_target_main
-  DEP_FILE = CMakeFiles\main.dir\lex.yy.c.obj.d
+build CMakeFiles/minic.dir/lex.yy.c.obj: C_COMPILER__minic_ D$:/Git/MiniC-Compiler/build/lex.yy.c || cmake_object_order_depends_target_minic
+  DEP_FILE = CMakeFiles\minic.dir\lex.yy.c.obj.d
   INCLUDES = -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
-  OBJECT_DIR = CMakeFiles\main.dir
-  OBJECT_FILE_DIR = CMakeFiles\main.dir
+  OBJECT_DIR = CMakeFiles\minic.dir
+  OBJECT_FILE_DIR = CMakeFiles\minic.dir
 
-build CMakeFiles/main.dir/main.c.obj: C_COMPILER__main_ D$:/Git/MiniC-Compiler/main.c || cmake_object_order_depends_target_main
-  DEP_FILE = CMakeFiles\main.dir\main.c.obj.d
+build CMakeFiles/minic.dir/main.c.obj: C_COMPILER__minic_ D$:/Git/MiniC-Compiler/main.c || cmake_object_order_depends_target_minic
+  DEP_FILE = CMakeFiles\minic.dir\main.c.obj.d
   INCLUDES = -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
-  OBJECT_DIR = CMakeFiles\main.dir
-  OBJECT_FILE_DIR = CMakeFiles\main.dir
+  OBJECT_DIR = CMakeFiles\minic.dir
+  OBJECT_FILE_DIR = CMakeFiles\minic.dir
 
-build CMakeFiles/main.dir/ast.c.obj: C_COMPILER__main_ D$:/Git/MiniC-Compiler/ast.c || cmake_object_order_depends_target_main
-  DEP_FILE = CMakeFiles\main.dir\ast.c.obj.d
+build CMakeFiles/minic.dir/ast.c.obj: C_COMPILER__minic_ D$:/Git/MiniC-Compiler/ast.c || cmake_object_order_depends_target_minic
+  DEP_FILE = CMakeFiles\minic.dir\ast.c.obj.d
   INCLUDES = -ID:/Git/MiniC-Compiler/build -ID:/Git/MiniC-Compiler -ID:/CompilerTools64/msys64/mingw64/bin/../include/graphviz
-  OBJECT_DIR = CMakeFiles\main.dir
-  OBJECT_FILE_DIR = CMakeFiles\main.dir
+  OBJECT_DIR = CMakeFiles\minic.dir
+  OBJECT_FILE_DIR = CMakeFiles\minic.dir
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target main
+# Link build statements for EXECUTABLE target minic
 
 
 #############################################
-# Link the executable main.exe
+# Link the executable minic.exe
 
-build main.exe: C_EXECUTABLE_LINKER__main_ CMakeFiles/main.dir/parser.tab.c.obj CMakeFiles/main.dir/lex.yy.c.obj CMakeFiles/main.dir/main.c.obj CMakeFiles/main.dir/ast.c.obj
+build minic.exe: C_EXECUTABLE_LINKER__minic_ CMakeFiles/minic.dir/parser.tab.c.obj CMakeFiles/minic.dir/lex.yy.c.obj CMakeFiles/minic.dir/main.c.obj CMakeFiles/minic.dir/ast.c.obj
   LINK_LIBRARIES = -lgvc  -lcgraph  -lcdt  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-  OBJECT_DIR = CMakeFiles\main.dir
+  OBJECT_DIR = CMakeFiles\minic.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_FILE = main.exe
-  TARGET_IMPLIB = libmain.dll.a
-  TARGET_PDB = main.exe.dbg
+  TARGET_FILE = minic.exe
+  TARGET_IMPLIB = libminic.dll.a
+  TARGET_PDB = minic.exe.dbg
 
 
 #############################################
@@ -130,7 +130,7 @@ build lex.yy.c | ${cmake_ninja_workdir}lex.yy.c: CUSTOM_COMMAND ../lex.l
 # =============================================================================
 # Target aliases.
 
-build main: phony main.exe
+build minic: phony minic.exe
 
 # =============================================================================
 # Folder targets.
@@ -140,7 +140,7 @@ build main: phony main.exe
 #############################################
 # Folder: D:/Git/MiniC-Compiler/build
 
-build all: phony main.exe
+build all: phony minic.exe
 
 # =============================================================================
 # Built-in targets

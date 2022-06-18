@@ -582,10 +582,10 @@ void prnIR(struct codenode *head){
                         sprintf(resultstr,"%s",t->result.id);
                     }
                     j=returnVarTablePos(t->result.id);
-                    if(VarT.sym[j].isArray==0) {
-                        fprintf(fp,"i32 %s",resultstr);
-                    } else {
+                    if(VarT.sym[j].isArray==1) {
                         fprintf(fp,"i32* %s",resultstr);
+                    } else {
+                        fprintf(fp,"i32 %s",resultstr);
                     }
                     t=t->next;
                     while(t->op==ARG) {
@@ -611,13 +611,16 @@ void prnIR(struct codenode *head){
                 fprintf(fp, "%s :\n",h->result.id);
                 break;
             case RC_SIGN:    
+                fprintf(fp, "%s :\n",h->result.id);
                 if(h->prior->op!=RETURN) {
                     fprintf(fp, "    exit\n");
                 }
-                fprintf(fp, "%s",h->result.id);
+                fprintf(fp, "}\n");
                 break;
-            case GOTO:     
-                fprintf(fp, "    br %s\n",resultstr);
+            case GOTO:
+                if(h->prior->op!=RETURN) {
+                    fprintf(fp, "    br %s\n",resultstr);
+                }
                 break;
             case LE:      
                 fprintf(fp, "    %s = cmp le %s, %s\n",resultstr,opnstr1,opnstr2);
@@ -720,7 +723,7 @@ void semanticError(int line,char *msg1,char *msg2){
 void prnSymbol()
 {
     int i=0;
-    printf( "%6s %6s %6s  %6s %4s %6s\n","name","alias","LEV","type","flag","offset");
+    printf( "%6s %6s %6s  %6s %4s\n","name","alias","LEV","type","flag");
     char ptype[10];
     for(i=11;i<SymT.index;i++)
     {
@@ -728,10 +731,10 @@ void prnSymbol()
         {
             strcpy(ptype,"int");
         }
-        printf( "%8s %6s %6d  %6s %4c %6d\n",SymT.sym[i].name,
+        printf( "%8s %6s %6d  %6s %4c\n",SymT.sym[i].name,
                 SymT.sym[i].alias,SymT.sym[i].level,
                 ptype,
-                SymT.sym[i].flag,SymT.sym[i].offset);
+                SymT.sym[i].flag);
         strcpy(ptype,"");
     }
     printf( "\n"); 
@@ -874,6 +877,7 @@ void extVarList(struct node *T)
             } else {
                 T->place = rtn;
             }
+            SymT.sym[rtn].isArray=0;
             T->num = 1;
             break;
         case _IDENT_COMMA:
@@ -886,6 +890,7 @@ void extVarList(struct node *T)
             T->ptr[0]->type = T->type;
             T->ptr[0]->offset=T->offset+T->width; //外部变量的偏移量向下传递
             T->ptr[0]->width=T->width;
+            SymT.sym[rtn].isArray=0;
             extVarList(T->ptr[0]);
             T->num = T->ptr[0]->num + 1;
             break;
@@ -975,6 +980,7 @@ void Exp(struct node *T)
                 result.kind = ID;
                 strcpy(result.id, SymT.sym[T->place].alias);
                 result.offset = SymT.sym[T->place].offset;
+                SymT.sym[T->place].isArray=0;
                 T->code = genIR(ASSIGNOP,opn1,opn2,result);
                 break;
             case _IDENT_ONLY:
@@ -1006,14 +1012,39 @@ void Exp(struct node *T)
                 Exp(T->ptr[1]);
                 T->type = INT, T->width = T->ptr[0]->width + T->ptr[1]->width + 2;
                 T->place=fillTemp(newTemp(),LEV,T->type,'T',T->offset+T->ptr[0]->width+T->ptr[1]->width);
+                T->code=NULL;
                 opn1.kind=ID; 
-                strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
-                opn1.type=T->ptr[0]->type;
-                opn1.offset=SymT.sym[T->ptr[0]->place].offset;
+                if(SymT.sym[T->ptr[0]->place].isArray!=1) {
+                    strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
+                    opn1.type=T->ptr[0]->type;
+                    opn1.offset=SymT.sym[T->ptr[0]->place].offset;
+                } else {
+                    int a;
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    opn1.kind=ID;
+                    strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
+                    result.kind=ID;
+                    strcpy(result.id,SymT.sym[a].alias);
+                    T->ptr[0]->code = merge(2,T->ptr[0]->code,genIR(ASSIGNOP,opn1,opn2,result));
+                    strcpy(opn1.id,SymT.sym[a].alias);
+                }
                 opn2.kind=ID; 
-                strcpy(opn2.id,SymT.sym[T->ptr[1]->place].alias);
-                opn2.type=T->ptr[1]->type;
-                opn2.offset=SymT.sym[T->ptr[1]->place].offset;
+                if(SymT.sym[T->ptr[1]->place].isArray!=1) {
+                    strcpy(opn2.id,SymT.sym[T->ptr[1]->place].alias);
+                    opn2.type=T->ptr[1]->type;
+                    opn2.offset=SymT.sym[T->ptr[1]->place].offset;
+                } else {
+                    int a;
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    opn1.kind=ID;
+                    strcpy(opn2.id,opn1.id);
+                    strcpy(opn1.id,SymT.sym[T->ptr[1]->place].alias);
+                    result.kind=ID;
+                    strcpy(result.id,SymT.sym[a].alias);
+                    T->ptr[1]->code = merge(2,T->ptr[1]->code,genIR(ASSIGNOP,opn1,opn2,result));
+                    strcpy(opn1.id,opn2.id);
+                    strcpy(opn2.id,SymT.sym[a].alias);
+                }
                 result.kind=ID; 
                 strcpy(result.id,SymT.sym[T->place].alias);
                 result.type=T->type;
@@ -1102,6 +1133,7 @@ void Exp(struct node *T)
                     result.kind = ID;
                     a = fillTemp(newTemp(),LEV,INT,'T',4);
                     strcpy(result.id, SymT.sym[a].alias);
+                    SymT.sym[a].isArray=0;
                     T->code = merge(2,T->code,genIR(_MUL,opn1,opn2,result));
                     opn1.kind = ID;
                     strcpy(opn1.id, SymT.sym[rtn].alias);
@@ -1125,6 +1157,7 @@ void Exp(struct node *T)
                     count++;
                     result.kind=ID;
                     a=fillTemp(newTemp(),LEV,INT,'T',4);
+                    SymT.sym[a].isArray=0;
                     result.kind=ID;
                     strcpy(result.id,SymT.sym[a].alias);
                     T->code=merge(2,T->code,genIR(_MUL,opn1,opn2,result));
@@ -1139,6 +1172,7 @@ void Exp(struct node *T)
                         count++;
                         result.kind=ID;
                         b=fillTemp(newTemp(),LEV,INT,'T',4);
+                        SymT.sym[b].isArray=0;
                         result.kind=ID;
                         strcpy(result.id,SymT.sym[b].alias);
                         T->code=merge(2,T->code,genIR(_MUL,opn1,opn2,result));
@@ -1158,6 +1192,7 @@ void Exp(struct node *T)
                     opn2.const_int = 4;
                     result.kind = ID;
                     a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    SymT.sym[a].isArray=0;
                     strcpy(result.id, SymT.sym[a].alias);
                     T->code = merge(2,T->code,genIR(_MUL,opn1,opn2,result));
                     opn1.kind = ID;
@@ -1227,11 +1262,12 @@ void Exp(struct node *T)
                 T->ptr[0]->offset=T->offset;
                 if(T->ptr[0]->kind==_IDENT_ONLY) {
                     rtn = searchSymbolTable(T->ptr[0]->type_id);
-                    if(SymT.sym[rtn].isArray==0) {
+                    if(SymT.sym[rtn].isArray!=1) {
                         opn1.kind=ID;
                         strcpy(opn1.id,SymT.sym[rtn].alias);
                         result.kind=ID;
                         rtn=fillTemp(newTemp(),LEV,INT,'T',T->ptr[0]->offset);
+                        SymT.sym[rtn].isArray=0;
                         strcpy(result.id,SymT.sym[rtn].alias);
                         T->ptr[0]->code=genIR(ASSIGNOP,opn1,opn2,result);
                     } else {
@@ -1301,15 +1337,41 @@ void boolExp(struct node *T)
                 Exp(T->ptr[1]);
                 if (T->width<T->ptr[1]->width) 
                     T->width=T->ptr[1]->width;
+                T->code = NULL;
                 opn1.kind=ID; 
-                strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
-                opn1.offset=SymT.sym[T->ptr[0]->place].offset;
+                if(SymT.sym[T->ptr[0]->place].isArray!=1) {
+                    strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
+                    opn1.offset=SymT.sym[T->ptr[0]->place].offset;
+                } else {
+                    int a;
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    opn1.kind=ID;
+                    strcpy(opn1.id,SymT.sym[T->ptr[0]->place].alias);
+                    result.kind=ID;
+                    strcpy(result.id,SymT.sym[a].alias);
+                    T->code = merge(2,T->code,genIR(ASSIGNOP,opn1,opn2,result));
+                    strcpy(opn1.id,SymT.sym[a].alias);
+                }
                 opn2.kind=ID; 
-                strcpy(opn2.id,SymT.sym[T->ptr[1]->place].alias);
-                opn2.offset=SymT.sym[T->ptr[1]->place].offset;
+                if(SymT.sym[T->ptr[1]->place].isArray!=1) {
+                    strcpy(opn2.id,SymT.sym[T->ptr[1]->place].alias);
+                    opn2.offset=SymT.sym[T->ptr[1]->place].offset;
+                } else {
+                    int a;
+                    a = fillTemp(newTemp(),LEV,INT,'T',4);
+                    opn1.kind=ID;
+                    strcpy(opn2.id,opn1.id);
+                    strcpy(opn1.id,SymT.sym[T->ptr[1]->place].alias);
+                    result.kind=ID;
+                    strcpy(result.id,SymT.sym[a].alias);
+                    T->code = merge(2,T->code,genIR(ASSIGNOP,opn1,opn2,result));
+                    strcpy(opn1.id,opn2.id);
+                    strcpy(opn2.id,SymT.sym[a].alias);
+                }
                 rtn=fillTemp(newTemp(),LEV,BOOL,'T',T->offset);
                 result.kind=ID; 
                 strcpy(result.id,SymT.sym[rtn].alias);
+                SymT.sym[rtn].isArray=0;
                 if(strcmp(T->type_id, "<") == 0) {
                     op = LT;
                 } else if (strcmp(T->type_id, "<=") == 0) {
@@ -1323,7 +1385,7 @@ void boolExp(struct node *T)
                 } else if (strcmp(T->type_id, "!=") == 0) {
                     op = NE;
                 }
-                T->code = genIR(op,opn1,opn2,result);
+                T->code = merge(2,T->code,genIR(op,opn1,opn2,result));
                 op = BC;
                 opn1.kind=ID;
                 strcpy(opn1.id,SymT.sym[rtn].alias);
@@ -1456,7 +1518,7 @@ void semanticAnalysis(struct node *T)
                 T->code = genIR(FUNCTION,opn1,opn2,result);
                 SymT.sym[rtn].paramnum = 0;
                 T->ptr[0]->offset = T->offset;
-                strcpy(T->ptr[0]->Snext, "}\n");
+                strcpy(T->ptr[0]->Snext, newLabel());
                 semanticAnalysis(T->ptr[0]);
                 SymT.sym[T->place].offset = T->offset + T->ptr[0]->width;
                 strcpy(result.id,T->ptr[0]->Snext);
@@ -1484,7 +1546,7 @@ void semanticAnalysis(struct node *T)
                 T->width += T->ptr[0]->width;
                 T->ptr[1]->offset = T->offset;
                 // strcpy(T->ptr[1]->Snext, newLabel());
-                strcpy(T->ptr[0]->Snext, "}\n");
+                strcpy(T->ptr[0]->Snext,newLabel());
                 semanticAnalysis(T->ptr[1]);
                 if(T->ptr[0]->ptr[0] != NULL) {
                     SymT.sym[T->place].offset = T->offset + T->ptr[1]->width;
